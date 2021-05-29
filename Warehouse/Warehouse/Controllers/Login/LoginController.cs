@@ -3,7 +3,7 @@ using Common.Types;
 
 namespace Warehouse.Controllers.Login
 {
-    class LoginController
+    public class LoginController
     {
         private ILoginControllerListener m_listener;
         private IDBProvider m_db;
@@ -28,7 +28,7 @@ namespace Warehouse.Controllers.Login
             }
             else if (account.password_hash.Length == 0)
             {
-                m_listener.onPasswordExpired();
+                m_listener.onPasswordExpired(account.id);
             }
             else if (account.password_hash == Common.Utils.toMD5(password))
             {
@@ -37,6 +37,20 @@ namespace Warehouse.Controllers.Login
             else
             {
                 m_listener.onLoginFailed();
+            }
+        }
+
+        public void updatePassword(int userID, string password)
+        {
+            m_db.updatePassword(userID, Common.Utils.toMD5(password));
+            Account account = m_db.getUserAccountData(userID);
+            if (account.password_hash == Common.Utils.toMD5(password))
+            {
+                m_listener.onPasswordUpdateSuccess();
+            }
+            else
+            {
+                m_listener.onPasswordUpdateFailed();
             }
         }
     }

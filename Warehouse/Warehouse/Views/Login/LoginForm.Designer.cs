@@ -64,6 +64,7 @@
             // 
             this.tb_password.Location = new System.Drawing.Point(12, 71);
             this.tb_password.Name = "tb_password";
+            this.tb_password.PasswordChar = '*';
             this.tb_password.Size = new System.Drawing.Size(272, 23);
             this.tb_password.TabIndex = 3;
             // 
@@ -87,8 +88,11 @@
             this.Controls.Add(this.tb_login);
             this.Controls.Add(this.lbl_password);
             this.Controls.Add(this.lbl_login);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
+            this.MaximizeBox = false;
             this.Name = "LoginForm";
-            this.Text = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Склад - авторизація ";
             this.ResumeLayout(false);
             this.PerformLayout();
 

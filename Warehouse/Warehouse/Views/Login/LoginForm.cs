@@ -7,6 +7,7 @@ namespace Warehouse.Views.Login
     public partial class LoginForm : Form, ILoginControllerListener
     {
         private LoginController m_ctrl;
+        private Form newPass = null;
         public LoginForm()
         {
             InitializeComponent();
@@ -23,9 +24,23 @@ namespace Warehouse.Views.Login
             // open general form
         }
 
-        public void onPasswordExpired()
+        public void onPasswordExpired(int userID)
         {
-            //MessageBox.Show("Expired");
+            newPass = new NewPasswordForm(m_ctrl, userID);
+            this.Hide();
+            newPass.ShowDialog();
+            this.Show();
+        }
+
+        public void onPasswordUpdateSuccess()
+        {
+            newPass.Close();
+            newPass = null;
+        }
+
+        public void onPasswordUpdateFailed()
+        {
+            MessageBox.Show("Пароль не встановлено");
         }
 
         public void onLoginFailed()

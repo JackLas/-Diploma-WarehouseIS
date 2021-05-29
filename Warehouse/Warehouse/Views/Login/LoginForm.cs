@@ -1,7 +1,6 @@
 ﻿using System.Windows.Forms;
 using Warehouse.Controllers.Login;
-
-using System.Configuration;
+using Common.Types;
 
 namespace Warehouse.Views.Login
 {
@@ -12,7 +11,6 @@ namespace Warehouse.Views.Login
         {
             InitializeComponent();
             m_ctrl = new LoginController(this);
-            //label1.Text = ConfigurationManager.AppSettings.Get("test");
         }
 
         private void btn_login_Click(object sender, System.EventArgs e)
@@ -20,21 +18,29 @@ namespace Warehouse.Views.Login
             m_ctrl.login(tb_login.Text, tb_password.Text);
         }
 
-        public void onLoginSuccess()
+        public void onLoginSuccess(Account account)
         {
-            MessageBox.Show("Success");
+            // open general form
         }
-        public void onLoginFailed()
-        {
 
-        }
         public void onPasswordExpired()
         {
-
+            //MessageBox.Show("Expired");
         }
+
+        public void onLoginFailed()
+        {
+            MessageBox.Show("Невірно введено логін або пароль");
+        }
+
         public void onAccountInactive()
         {
+            MessageBox.Show("Обліковий запис деактивовано");
+        }
 
+        public void onUserNotFound()
+        {
+            MessageBox.Show("Користувача не знайдено");
         }
     }
 }

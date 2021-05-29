@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace Common
 {
-    class Utils
+    public class Utils
     {
         public const string phoneFormat = "+380ХХХХХХХХХ";
         private const string phoneRegex = @"\+380\d{9}$";

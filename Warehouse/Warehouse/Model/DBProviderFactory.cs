@@ -16,7 +16,7 @@ namespace Warehouse.Model
                     return new PostgreSQLProvider(ConfigurationManager.AppSettings.Get("db_ip"), ConfigurationManager.AppSettings.Get("db_port"));
                 default: break;
             }
-            return null;
+            return new PostgreSQLProvider(ConfigurationManager.AppSettings.Get("db_ip"), ConfigurationManager.AppSettings.Get("db_port"));
         }
     }
 }

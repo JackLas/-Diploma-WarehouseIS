@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Warehouse.Views.General
@@ -25,14 +20,48 @@ namespace Warehouse.Views.General
 
         }
 
-        private void btn_add_shelf_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void btn_add_client_Click(object sender, EventArgs e)
         {
 
         }
+
+        private void btn_employee_add_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btn_add_shelf_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            Form dialog = new NewShelfForm();
+            dialog.ShowDialog();
+            this.Show();
+        }
+
+        private void btn_topology_add_row_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btn_topology_delete_row_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btn_topology_add_column_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btn_topology_delete_column_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btn_save_warehouse_Click(object sender, EventArgs e)
+        {
+
+        }
+
     }
 }

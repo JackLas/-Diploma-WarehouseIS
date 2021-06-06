@@ -34,7 +34,7 @@ namespace Warehouse.Views.General
             this.lb_items = new System.Windows.Forms.ListBox();
             this.tb_item_search = new System.Windows.Forms.TextBox();
             this.tp_orders = new System.Windows.Forms.TabPage();
-            this.btn_new_item_action = new System.Windows.Forms.Button();
+            this.btn_new_order = new System.Windows.Forms.Button();
             this.lb_orders = new System.Windows.Forms.ListBox();
             this.tp_admin = new System.Windows.Forms.TabPage();
             this.dgv_topologyWH = new System.Windows.Forms.DataGridView();
@@ -88,7 +88,7 @@ namespace Warehouse.Views.General
             // 
             // tp_orders
             // 
-            this.tp_orders.Controls.Add(this.btn_new_item_action);
+            this.tp_orders.Controls.Add(this.btn_new_order);
             this.tp_orders.Controls.Add(this.lb_orders);
             this.tp_orders.Location = new System.Drawing.Point(4, 24);
             this.tp_orders.Name = "tp_orders";
@@ -98,15 +98,15 @@ namespace Warehouse.Views.General
             this.tp_orders.Text = "Черга прийому";
             this.tp_orders.UseVisualStyleBackColor = true;
             // 
-            // btn_new_item_action
+            // btn_new_order
             // 
-            this.btn_new_item_action.Location = new System.Drawing.Point(149, 600);
-            this.btn_new_item_action.Name = "btn_new_item_action";
-            this.btn_new_item_action.Size = new System.Drawing.Size(156, 23);
-            this.btn_new_item_action.TabIndex = 1;
-            this.btn_new_item_action.Text = "Нова дія";
-            this.btn_new_item_action.UseVisualStyleBackColor = true;
-            this.btn_new_item_action.Click += new System.EventHandler(this.btn_new_item_action_Click);
+            this.btn_new_order.Location = new System.Drawing.Point(149, 600);
+            this.btn_new_order.Name = "btn_new_order";
+            this.btn_new_order.Size = new System.Drawing.Size(156, 23);
+            this.btn_new_order.TabIndex = 1;
+            this.btn_new_order.Text = "Нова дія";
+            this.btn_new_order.UseVisualStyleBackColor = true;
+            this.btn_new_order.Click += new System.EventHandler(this.btn_new_order_Click);
             // 
             // lb_orders
             // 
@@ -151,6 +151,7 @@ namespace Warehouse.Views.General
             this.Controls.Add(this.cb_currentWH);
             this.Controls.Add(this.dgv_topologyWH);
             this.Controls.Add(this.tabs);
+            this.MaximizeBox = false;
             this.Name = "GeneralForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Склад - Головна";
@@ -172,7 +173,7 @@ namespace Warehouse.Views.General
         private System.Windows.Forms.ComboBox cb_currentWH;
         private System.Windows.Forms.ListBox lb_items;
         private System.Windows.Forms.TextBox tb_item_search;
-        private System.Windows.Forms.Button btn_new_item_action;
+        private System.Windows.Forms.Button btn_new_order;
         private System.Windows.Forms.ListBox lb_orders;
         private System.Windows.Forms.TabPage tp_admin;
     }

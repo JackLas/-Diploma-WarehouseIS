@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Windows.Forms;
+using Warehouse.Controllers.Admin;
 
 namespace Warehouse.Views.General
 {
-    public partial class AdminForm : Form
+    public partial class AdminForm : Form, IAdminControllerListener
     {
+        private AdminController m_ctrl;
         public AdminForm()
         {
             InitializeComponent();
+            m_ctrl = new AdminController(this);
         }
 
         private void tp_employees_Click(object sender, EventArgs e)
@@ -63,5 +66,10 @@ namespace Warehouse.Views.General
 
         }
 
+        private void AdminForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            m_ctrl.Dispose();
+            m_ctrl = null;
+        }
     }
 }

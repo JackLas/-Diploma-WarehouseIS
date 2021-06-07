@@ -1,23 +1,22 @@
-﻿using Common.Interfaces;
-using Common.Types;
+﻿using Common.Types;
 
 namespace Warehouse.Controllers.Login
 {
-    public class LoginController
+    public class LoginController : BaseController
     {
         private ILoginControllerListener m_listener;
-        private IDBProvider m_db;
-        public LoginController(ILoginControllerListener listener)
+        
+        public LoginController(ILoginControllerListener listener) : base()
         {
             m_listener = listener;
-            m_db = Model.DBProviderFactory.createProvider();
-            m_db.open();
         }
 
         public void login(string username, string password)
         {
             Account account = m_db.getUserAccountData(username);
-            
+
+            if (m_listener == null) return;
+
             if (account == null)
             {
                 m_listener.onUserNotFound();
@@ -44,6 +43,9 @@ namespace Warehouse.Controllers.Login
         {
             m_db.updatePassword(userID, Common.Utils.toMD5(password));
             Account account = m_db.getUserAccountData(userID);
+
+            if (m_listener == null) return;
+
             if (account.password_hash == Common.Utils.toMD5(password))
             {
                 m_listener.onPasswordUpdateSuccess();

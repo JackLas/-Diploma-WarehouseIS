@@ -31,6 +31,12 @@ namespace Warehouse.Views.General
         {
             this.tabs = new System.Windows.Forms.TabControl();
             this.tp_topology = new System.Windows.Forms.TabPage();
+            this.tb_warehouse_name = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.btn_topology_delete_column = new System.Windows.Forms.Button();
+            this.btn_topology_add_column = new System.Windows.Forms.Button();
+            this.btn_topology_delete_row = new System.Windows.Forms.Button();
+            this.btn_topology_add_row = new System.Windows.Forms.Button();
             this.btn_save_warehouse = new System.Windows.Forms.Button();
             this.btn_add_shelf = new System.Windows.Forms.Button();
             this.lb_shelf = new System.Windows.Forms.ListBox();
@@ -59,12 +65,6 @@ namespace Warehouse.Views.General
             this.lbl_client_name = new System.Windows.Forms.Label();
             this.tb_search_client = new System.Windows.Forms.TextBox();
             this.lb_clients = new System.Windows.Forms.ListBox();
-            this.btn_topology_add_row = new System.Windows.Forms.Button();
-            this.btn_topology_delete_row = new System.Windows.Forms.Button();
-            this.btn_topology_add_column = new System.Windows.Forms.Button();
-            this.btn_topology_delete_column = new System.Windows.Forms.Button();
-            this.label6 = new System.Windows.Forms.Label();
-            this.tb_warehouse_name = new System.Windows.Forms.TextBox();
             this.tabs.SuspendLayout();
             this.tp_topology.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgv_topology)).BeginInit();
@@ -102,6 +102,62 @@ namespace Warehouse.Views.General
             this.tp_topology.TabIndex = 0;
             this.tp_topology.Text = "Топологія";
             this.tp_topology.UseVisualStyleBackColor = true;
+            // 
+            // tb_warehouse_name
+            // 
+            this.tb_warehouse_name.Location = new System.Drawing.Point(46, 3);
+            this.tb_warehouse_name.Name = "tb_warehouse_name";
+            this.tb_warehouse_name.Size = new System.Drawing.Size(933, 23);
+            this.tb_warehouse_name.TabIndex = 9;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(6, 6);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(45, 15);
+            this.label6.TabIndex = 8;
+            this.label6.Text = "Назва: ";
+            // 
+            // btn_topology_delete_column
+            // 
+            this.btn_topology_delete_column.Location = new System.Drawing.Point(356, 600);
+            this.btn_topology_delete_column.Name = "btn_topology_delete_column";
+            this.btn_topology_delete_column.Size = new System.Drawing.Size(122, 23);
+            this.btn_topology_delete_column.TabIndex = 7;
+            this.btn_topology_delete_column.Text = "Видалити стовпець";
+            this.btn_topology_delete_column.UseVisualStyleBackColor = true;
+            this.btn_topology_delete_column.Click += new System.EventHandler(this.btn_topology_delete_column_Click);
+            // 
+            // btn_topology_add_column
+            // 
+            this.btn_topology_add_column.Location = new System.Drawing.Point(241, 601);
+            this.btn_topology_add_column.Name = "btn_topology_add_column";
+            this.btn_topology_add_column.Size = new System.Drawing.Size(109, 23);
+            this.btn_topology_add_column.TabIndex = 6;
+            this.btn_topology_add_column.Text = "Додати стовпець";
+            this.btn_topology_add_column.UseVisualStyleBackColor = true;
+            this.btn_topology_add_column.Click += new System.EventHandler(this.btn_topology_add_column_Click);
+            // 
+            // btn_topology_delete_row
+            // 
+            this.btn_topology_delete_row.Location = new System.Drawing.Point(109, 601);
+            this.btn_topology_delete_row.Name = "btn_topology_delete_row";
+            this.btn_topology_delete_row.Size = new System.Drawing.Size(97, 23);
+            this.btn_topology_delete_row.TabIndex = 5;
+            this.btn_topology_delete_row.Text = "Видалити ряд";
+            this.btn_topology_delete_row.UseVisualStyleBackColor = true;
+            this.btn_topology_delete_row.Click += new System.EventHandler(this.btn_topology_delete_row_Click);
+            // 
+            // btn_topology_add_row
+            // 
+            this.btn_topology_add_row.Location = new System.Drawing.Point(6, 600);
+            this.btn_topology_add_row.Name = "btn_topology_add_row";
+            this.btn_topology_add_row.Size = new System.Drawing.Size(97, 23);
+            this.btn_topology_add_row.TabIndex = 4;
+            this.btn_topology_add_row.Text = "Додати ряд";
+            this.btn_topology_add_row.UseVisualStyleBackColor = true;
+            this.btn_topology_add_row.Click += new System.EventHandler(this.btn_topology_add_row_Click);
             // 
             // btn_save_warehouse
             // 
@@ -367,62 +423,6 @@ namespace Warehouse.Views.General
             this.lb_clients.Size = new System.Drawing.Size(661, 589);
             this.lb_clients.TabIndex = 2;
             // 
-            // btn_topology_add_row
-            // 
-            this.btn_topology_add_row.Location = new System.Drawing.Point(6, 600);
-            this.btn_topology_add_row.Name = "btn_topology_add_row";
-            this.btn_topology_add_row.Size = new System.Drawing.Size(97, 23);
-            this.btn_topology_add_row.TabIndex = 4;
-            this.btn_topology_add_row.Text = "Додати ряд";
-            this.btn_topology_add_row.UseVisualStyleBackColor = true;
-            this.btn_topology_add_row.Click += new System.EventHandler(this.btn_topology_add_row_Click);
-            // 
-            // btn_topology_delete_row
-            // 
-            this.btn_topology_delete_row.Location = new System.Drawing.Point(109, 601);
-            this.btn_topology_delete_row.Name = "btn_topology_delete_row";
-            this.btn_topology_delete_row.Size = new System.Drawing.Size(97, 23);
-            this.btn_topology_delete_row.TabIndex = 5;
-            this.btn_topology_delete_row.Text = "Видалити ряд";
-            this.btn_topology_delete_row.UseVisualStyleBackColor = true;
-            this.btn_topology_delete_row.Click += new System.EventHandler(this.btn_topology_delete_row_Click);
-            // 
-            // btn_topology_add_column
-            // 
-            this.btn_topology_add_column.Location = new System.Drawing.Point(241, 601);
-            this.btn_topology_add_column.Name = "btn_topology_add_column";
-            this.btn_topology_add_column.Size = new System.Drawing.Size(109, 23);
-            this.btn_topology_add_column.TabIndex = 6;
-            this.btn_topology_add_column.Text = "Додати стовпець";
-            this.btn_topology_add_column.UseVisualStyleBackColor = true;
-            this.btn_topology_add_column.Click += new System.EventHandler(this.btn_topology_add_column_Click);
-            // 
-            // btn_topology_delete_column
-            // 
-            this.btn_topology_delete_column.Location = new System.Drawing.Point(356, 600);
-            this.btn_topology_delete_column.Name = "btn_topology_delete_column";
-            this.btn_topology_delete_column.Size = new System.Drawing.Size(122, 23);
-            this.btn_topology_delete_column.TabIndex = 7;
-            this.btn_topology_delete_column.Text = "Видалити стовпець";
-            this.btn_topology_delete_column.UseVisualStyleBackColor = true;
-            this.btn_topology_delete_column.Click += new System.EventHandler(this.btn_topology_delete_column_Click);
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(6, 6);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(45, 15);
-            this.label6.TabIndex = 8;
-            this.label6.Text = "Назва: ";
-            // 
-            // tb_warehouse_name
-            // 
-            this.tb_warehouse_name.Location = new System.Drawing.Point(46, 3);
-            this.tb_warehouse_name.Name = "tb_warehouse_name";
-            this.tb_warehouse_name.Size = new System.Drawing.Size(933, 23);
-            this.tb_warehouse_name.TabIndex = 9;
-            // 
             // AdminForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -433,6 +433,7 @@ namespace Warehouse.Views.General
             this.Name = "AdminForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Склад - Адміністрування";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.AdminForm_FormClosed);
             this.tabs.ResumeLayout(false);
             this.tp_topology.ResumeLayout(false);
             this.tp_topology.PerformLayout();

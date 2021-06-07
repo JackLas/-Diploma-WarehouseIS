@@ -21,7 +21,12 @@ namespace Warehouse.Views.Login
 
         public void onLoginSuccess(Account account)
         {
-            // open general form
+            this.Hide();
+            m_ctrl.Dispose();
+            m_ctrl = null;
+            Form general = new Warehouse.Views.General.GeneralForm();
+            general.ShowDialog();
+            this.Close();
         }
 
         public void onPasswordExpired(int userID)

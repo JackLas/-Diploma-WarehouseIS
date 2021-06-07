@@ -155,6 +155,7 @@ namespace Warehouse.Views.General
             this.Name = "GeneralForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Склад - Головна";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.GeneralForm_FormClosed);
             this.tabs.ResumeLayout(false);
             this.tp_items.ResumeLayout(false);
             this.tp_items.PerformLayout();

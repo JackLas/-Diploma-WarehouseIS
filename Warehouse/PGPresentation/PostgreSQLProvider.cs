@@ -15,13 +15,14 @@ namespace PGPresentation
             str.Port = int.Parse(port);
             str.Username = "postgres";
             str.Database = "Warehouse";
+            str.ApplicationName = "DBG"; // todo: remove
 
             m_db = new NpgsqlConnection(str.ToString());
         }
 
         public void Dispose()
         {
-            m_db.Close();
+            close();
         }
 
         public void open()
@@ -32,6 +33,7 @@ namespace PGPresentation
         public void close()
         {
             m_db.Close();
+            m_db.Dispose();
         }
 
         public Account getUserAccountData(string username)

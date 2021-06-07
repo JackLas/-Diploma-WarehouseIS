@@ -1,4 +1,6 @@
-﻿namespace Common.Interfaces
+﻿using System.Collections.Generic;
+
+namespace Common.Interfaces
 {
     public interface IDBProvider
     {
@@ -10,5 +12,15 @@
         public abstract Types.Account getUserAccountData(int userID);
 
         public abstract void updatePassword(int userID, string password);
+
+        public abstract bool isUsernameAlreadyExists(string username);
+
+        public abstract void addUser(string username, int accessLevel);
+
+        public abstract void addEmployee(string fullname, string phone, string address, int accountID);
+
+        public abstract List<Common.Types.Employee> getEmployees(string search);
+
+        public abstract Common.Types.Employee getEmployeeByID(int id);
     }
 }

@@ -219,7 +219,6 @@ namespace Warehouse.Views.General
             this.tp_employees.TabIndex = 1;
             this.tp_employees.Text = "Співробітники";
             this.tp_employees.UseVisualStyleBackColor = true;
-            this.tp_employees.Click += new System.EventHandler(this.tp_employees_Click);
             // 
             // cb_empl_post
             // 
@@ -328,6 +327,7 @@ namespace Warehouse.Views.General
             this.lb_employee.Name = "lb_employee";
             this.lb_employee.Size = new System.Drawing.Size(661, 589);
             this.lb_employee.TabIndex = 0;
+            this.lb_employee.SelectedIndexChanged += new System.EventHandler(this.lb_employee_SelectedIndexChanged);
             // 
             // tp_clients
             // 
@@ -434,6 +434,7 @@ namespace Warehouse.Views.General
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Склад - Адміністрування";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.AdminForm_FormClosed);
+            this.Load += new System.EventHandler(this.AdminForm_Load);
             this.tabs.ResumeLayout(false);
             this.tp_topology.ResumeLayout(false);
             this.tp_topology.PerformLayout();

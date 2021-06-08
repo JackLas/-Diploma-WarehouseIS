@@ -150,7 +150,7 @@ namespace PGPresentation
         {
             List<Common.Types.Employee> result = new List<Common.Types.Employee>();
 
-            string sql = "SELECT * FROM employees WHERE fullname LIKE @search OR address LIKE @search";
+            string sql = "SELECT * FROM employees WHERE LOWER(fullname) LIKE LOWER(@search) OR LOWER(address) LIKE LOWER(@search)";
 
             using (var cmd = new NpgsqlCommand(sql, m_db))
             {
@@ -164,8 +164,8 @@ namespace PGPresentation
 
                     empl.id = data.GetInt32(0);
                     empl.fullName = data.GetString(1);
-                    empl.phone = data.GetString(2);
-                    empl.address = data.GetString(3);
+                    empl.phone = data.IsDBNull(2) ? "" : data.GetString(2);
+                    empl.address = data.IsDBNull(3) ? "" : data.GetString(3);
                     empl.account_id = data.GetInt32(4);
 
                     result.Add(empl);
@@ -194,8 +194,8 @@ namespace PGPresentation
 
                     empl.id = data.GetInt32(0);
                     empl.fullName = data.GetString(1);
-                    empl.phone = data.GetString(2);
-                    empl.address = data.GetString(3);
+                    empl.phone = data.IsDBNull(2) ? "" : data.GetString(2);
+                    empl.address = data.IsDBNull(3) ? "" : data.GetString(3);
                     empl.account_id = data.GetInt32(4);
                 }
 
@@ -203,6 +203,76 @@ namespace PGPresentation
             }
 
             return empl;
+        }
+
+        public void addClient(string name, string address, string info)
+        {
+            string sql = "INSERT INTO clients(title, address, info) VALUES (@title, @address, @info)";
+
+            using (var cmd = new NpgsqlCommand(sql , m_db))
+            {
+                cmd.Parameters.AddWithValue("title", name);
+                cmd.Parameters.AddWithValue("address", address);
+                cmd.Parameters.AddWithValue("info", info);
+
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public List<Client> getClients(string search)
+        {
+            List<Client> result = new List<Client>();
+
+            string sql = "SELECT * FROM clients WHERE LOWER(title) LIKE LOWER(@search) OR address LIKE LOWER(@search)";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("search", "%" + search + "%");
+
+                var data = cmd.ExecuteReader();
+
+                while(data.Read())
+                {
+                    Client client = new Client();
+
+                    client.id = data.GetInt32(0);
+                    client.title = data.GetString(1);
+                    client.address = data.GetString(2);
+                    client.info = data.IsDBNull(3) ? "" : data.GetString(3);
+
+                    result.Add(client);
+                }
+
+                data.Close();
+            }
+
+            return result;
+        }
+
+        public Client getClientByID(int id)
+        {
+            Client result = null;
+            string sql = "SELECT * FROM clients WHERE id=@id";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("id", id);
+
+                var data = cmd.ExecuteReader();
+
+                if (data.Read())
+                {
+                    result = new Client();
+                    result.id = data.GetInt32(0);
+                    result.title = data.GetString(1);
+                    result.address = data.GetString(2);
+                    result.info = data.IsDBNull(3) ? "" : data.GetString(3);
+                }
+
+                data.Close();
+            }
+
+            return result;
         }
     }
 }

@@ -9,5 +9,9 @@ namespace Warehouse.Controllers.Admin
         public abstract void onEmployeeAdded();
 
         public abstract void onEmployeeListUpdate(List<Common.Types.Employee> employees);
+
+        public abstract void onClientAdded();
+
+        public abstract void onClientListRefresh(List<Common.Types.Client> clientList);
     }
 }

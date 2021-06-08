@@ -27,6 +27,7 @@ namespace Warehouse.Views.General
             cb_empl_post.Items.Add("Робітник складу");
 
             m_ctrl.refreshEmployeeList();
+            m_ctrl.refreshClientList();
         }
 
         private void tb_search_employee_TextChanged(object sender, EventArgs e)
@@ -87,8 +88,8 @@ namespace Warehouse.Views.General
 
         public void onEmployeeListUpdate(List<Common.Types.Employee> employees)
         {
+            lb_employee.ClearSelected();
             lb_employee.Items.Clear();
-
             foreach (var empl in employees)
             {
                 lb_employee.Items.Add(empl.id.ToString() + ": " + empl.fullName);
@@ -106,18 +107,85 @@ namespace Warehouse.Views.General
             if (Common.Utils.getIDFromString(str, out id))
             {
                 var empl = m_ctrl.getEmployeeByID(id);
-                MessageBox.Show(
-                    "ID: " + empl.id + "\n" +
-                    "ПІБ: " + empl.fullName + "\n" +
-                    "Телефон: " + empl.phone + "\n" +
-                    "Адреса: " + "\n" + empl.address
-                );
+
+                if (empl != null)
+                {
+                    MessageBox.Show(
+                        "ID: " + empl.id + "\n" +
+                        "ПІБ: " + empl.fullName + "\n" +
+                        "Телефон: " + empl.phone + "\n" +
+                        "Адреса: " + "\n" + empl.address
+                    );
+                }
             }
         }
 
         private void btn_add_client_Click(object sender, EventArgs e)
         {
+            if (tb_client_name.Text.Length == 0)
+            {
+                MessageBox.Show("Введіть назву клієнта");
+            }
+            else if (tb_client_address.Text.Length == 0)
+            {
+                MessageBox.Show("Введіть адресу клієнта");
+            }
+            else
+            {
+                m_ctrl.addClient(
+                    tb_client_name.Text,
+                    tb_client_address.Text,
+                    rtb_client_additional.Text
+                );
+            }
+        }
 
+        private void tb_search_client_TextChanged(object sender, EventArgs e)
+        {
+            m_ctrl.refreshClientList(tb_search_client.Text);
+        }
+
+        public void onClientAdded()
+        {
+            MessageBox.Show("Клієнта додано");
+            tb_client_name.Clear();
+            tb_client_address.Clear();
+            rtb_client_additional.Clear();
+            m_ctrl.refreshClientList(tb_search_client.Text);
+        }
+
+        public void onClientListRefresh(List<Common.Types.Client> clientList)
+        {
+            lb_clients.ClearSelected();
+            lb_clients.Items.Clear();
+            foreach (var client in clientList)
+            {
+                lb_clients.Items.Add(client.id.ToString() + ": " + client.title);
+            }
+        }
+
+        private void lb_clients_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (lb_clients.SelectedIndex == -1) return;
+
+            var str = lb_clients.SelectedItem.ToString();
+
+            int id = -1;
+
+            if (Common.Utils.getIDFromString(str, out id))
+            {
+                var client = m_ctrl.getClientByID(id);
+
+                if (client != null)
+                {
+                    MessageBox.Show(
+                        "ID: " + client.id + "\n" +
+                        "Назва: " + client.title + "\n" +
+                        "Адреса: " + "\n" + client.address + "\n" + 
+                        (client.info.Length == 0 ? "" : "Додаткова інформація:\n" +  client.info)
+                    );
+                }
+            }
         }
 
         private void btn_add_shelf_Click(object sender, EventArgs e)

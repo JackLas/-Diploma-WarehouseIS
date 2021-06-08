@@ -22,5 +22,11 @@ namespace Common.Interfaces
         public abstract List<Common.Types.Employee> getEmployees(string search);
 
         public abstract Common.Types.Employee getEmployeeByID(int id);
+
+        public abstract void addClient(string name, string address, string info);
+
+        public abstract List<Common.Types.Client> getClients(string search);
+
+        public abstract Common.Types.Client getClientByID(int id);
     }
 }

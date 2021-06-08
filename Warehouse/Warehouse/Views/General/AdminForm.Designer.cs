@@ -413,6 +413,7 @@ namespace Warehouse.Views.General
             this.tb_search_client.Name = "tb_search_client";
             this.tb_search_client.Size = new System.Drawing.Size(661, 23);
             this.tb_search_client.TabIndex = 3;
+            this.tb_search_client.TextChanged += new System.EventHandler(this.tb_search_client_TextChanged);
             // 
             // lb_clients
             // 
@@ -422,6 +423,7 @@ namespace Warehouse.Views.General
             this.lb_clients.Name = "lb_clients";
             this.lb_clients.Size = new System.Drawing.Size(661, 589);
             this.lb_clients.TabIndex = 2;
+            this.lb_clients.SelectedIndexChanged += new System.EventHandler(this.lb_clients_SelectedIndexChanged);
             // 
             // AdminForm
             // 

@@ -35,5 +35,22 @@
         {
             return m_db.getEmployeeByID(id);
         }
+
+        public void addClient(string name, string address, string info)
+        {
+            m_db.addClient(name, address, info);
+            m_listener.onClientAdded();
+        }
+
+        public void refreshClientList(string search = "")
+        {
+            var clientList = m_db.getClients(search);
+            m_listener.onClientListRefresh(clientList);
+        }
+
+        public Common.Types.Client getClientByID(int id)
+        {
+            return m_db.getClientByID(id);
+        }
     }
 }

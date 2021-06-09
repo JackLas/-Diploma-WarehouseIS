@@ -8,10 +8,12 @@ namespace Warehouse.Views.General
     public partial class AdminForm : Form, IAdminControllerListener
     {
         private AdminController m_ctrl;
+        private Topology.TopologyBuilder m_topologyBuilder;
         public AdminForm()
         {
             InitializeComponent();
             m_ctrl = new AdminController(this);
+            m_topologyBuilder = new Topology.TopologyBuilder();
         }
 
         private void AdminForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -198,22 +200,27 @@ namespace Warehouse.Views.General
 
         private void btn_topology_add_row_Click(object sender, EventArgs e)
         {
-
+            m_ctrl.topologyAddRow();
         }
 
         private void btn_topology_delete_row_Click(object sender, EventArgs e)
         {
-
+            m_ctrl.topologyDeleteRow();
         }
 
         private void btn_topology_add_column_Click(object sender, EventArgs e)
         {
-
+            m_ctrl.topologyAddColumn();
         }
 
         private void btn_topology_delete_column_Click(object sender, EventArgs e)
         {
+            m_ctrl.topologyDeleteColumn();
+        }
 
+        public void onCurrentTopologyUpdate(Common.Types.Topology topology)
+        {
+            m_topologyBuilder.rebuild(topology, dgv_topology);
         }
 
         private void btn_save_warehouse_Click(object sender, EventArgs e)

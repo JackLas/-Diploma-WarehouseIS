@@ -13,5 +13,7 @@ namespace Warehouse.Controllers.Admin
         public abstract void onClientAdded();
 
         public abstract void onClientListRefresh(List<Common.Types.Client> clientList);
+
+        public abstract void onCurrentTopologyUpdate(Common.Types.Topology topology);
     }
 }

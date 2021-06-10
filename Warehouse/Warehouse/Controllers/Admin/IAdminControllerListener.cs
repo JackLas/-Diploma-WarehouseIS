@@ -2,7 +2,7 @@
 
 namespace Warehouse.Controllers.Admin
 {
-    interface IAdminControllerListener
+    public interface IAdminControllerListener
     {
         public abstract void onLoginAlreadyExists();
 
@@ -15,5 +15,9 @@ namespace Warehouse.Controllers.Admin
         public abstract void onClientListRefresh(List<Common.Types.Client> clientList);
 
         public abstract void onCurrentTopologyUpdate(Common.Types.Topology topology);
+
+        public abstract void onNewShelfAdded();
+
+        public abstract void onShelfListRefresh(List<Common.Types.Shelf> shelfList);
     }
 }

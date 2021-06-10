@@ -28,5 +28,11 @@ namespace Common.Interfaces
         public abstract List<Common.Types.Client> getClients(string search);
 
         public abstract Common.Types.Client getClientByID(int id);
+
+        public abstract void addNewShelf(string name, int length, int width, int height, int weight, int levels);
+        
+        public abstract List<Common.Types.Shelf> getShelfList();
+
+        public abstract Common.Types.Shelf getShelfByID(int id);
     }
 }

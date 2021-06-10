@@ -30,6 +30,7 @@ namespace Warehouse.Views.General
 
             m_ctrl.refreshEmployeeList();
             m_ctrl.refreshClientList();
+            m_ctrl.refreshShelfList();
         }
 
         private void tb_search_employee_TextChanged(object sender, EventArgs e)
@@ -193,9 +194,49 @@ namespace Warehouse.Views.General
         private void btn_add_shelf_Click(object sender, EventArgs e)
         {
             this.Hide();
-            Form dialog = new NewShelfForm();
-            dialog.ShowDialog();
+            Form newShelfForm = new NewShelfForm(m_ctrl);
+            newShelfForm.ShowDialog();
             this.Show();
+        }
+
+        public void onNewShelfAdded()
+        {
+            m_ctrl.refreshShelfList();
+            MessageBox.Show("Стелаж додано");
+        }
+        public void onShelfListRefresh(List<Common.Types.Shelf> shelfList)
+        {
+            lb_shelf.Items.Clear();
+            foreach (var shelf in shelfList)
+            {
+                lb_shelf.Items.Add(shelf.id.ToString() + ": " + shelf.name);
+            }
+        }
+
+        private void lb_shelf_DoubleClick(object sender, EventArgs e)
+        {
+            if (lb_shelf.SelectedIndex == -1) return;
+
+            var str = lb_shelf.SelectedItem.ToString();
+
+            int id = -1;
+
+            if (Common.Utils.getIDFromString(str, out id))
+            {
+                var shelf = m_ctrl.getShelfByID(id);
+
+                if (shelf != null)
+                {
+                    MessageBox.Show(
+                        "ID: " + shelf.id + "\n" +
+                        "Назва: " + shelf.name + "\n" +
+                        "Габарити (ДхШхВ), мм:\n" +
+                        shelf.length + " x " + shelf.width + " x " + shelf.height + "\n" +
+                        "Максимальна вага: " + shelf.weight + "\n" +
+                        "Рівні: " + shelf.levels
+                    );
+                }
+            }
         }
 
         private void btn_topology_add_row_Click(object sender, EventArgs e)
@@ -226,6 +267,31 @@ namespace Warehouse.Views.General
         private void btn_save_warehouse_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void dgv_topology_Click(object sender, EventArgs e)
+        {
+            var mouseEvent = (MouseEventArgs) e;
+
+            if (mouseEvent.Button == MouseButtons.Left) // add
+            {
+                if (dgv_topology.SelectedCells.Count > 0)
+                {
+                    int shelfID = -1;
+                    if (lb_shelf.SelectedIndex >= 0 && Common.Utils.getIDFromString(lb_shelf.SelectedItem.ToString(), out shelfID))
+                    {
+                        var selectedCell = dgv_topology.SelectedCells[0];
+                        m_ctrl.addShelfToTopology(shelfID, selectedCell.ColumnIndex, selectedCell.RowIndex);
+                    }
+                }
+            }
+            else if (mouseEvent.Button == MouseButtons.Right) // remove
+            {
+                var selectedCell = dgv_topology.HitTest(mouseEvent.X, mouseEvent.Y);
+                m_ctrl.removeShelfFromTopology(selectedCell.ColumnIndex, selectedCell.RowIndex);
+            }
+
+            dgv_topology.ClearSelection();
         }
     }
 }

@@ -187,15 +187,25 @@ namespace Warehouse.Views.General
             this.lb_shelf.Name = "lb_shelf";
             this.lb_shelf.Size = new System.Drawing.Size(241, 589);
             this.lb_shelf.TabIndex = 1;
+            this.lb_shelf.DoubleClick += new System.EventHandler(this.lb_shelf_DoubleClick);
             // 
             // dgv_topology
             // 
-            this.dgv_topology.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgv_topology.AllowUserToAddRows = false;
+            this.dgv_topology.AllowUserToDeleteRows = false;
+            this.dgv_topology.AllowUserToResizeColumns = false;
+            this.dgv_topology.AllowUserToResizeRows = false;
+            this.dgv_topology.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this.dgv_topology.Location = new System.Drawing.Point(6, 30);
+            this.dgv_topology.MultiSelect = false;
             this.dgv_topology.Name = "dgv_topology";
+            this.dgv_topology.ReadOnly = true;
+            this.dgv_topology.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this.dgv_topology.RowTemplate.Height = 25;
+            this.dgv_topology.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.dgv_topology.Size = new System.Drawing.Size(973, 565);
             this.dgv_topology.TabIndex = 0;
+            this.dgv_topology.Click += new System.EventHandler(this.dgv_topology_Click);
             // 
             // tp_employees
             // 

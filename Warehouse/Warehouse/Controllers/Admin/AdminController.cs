@@ -1,6 +1,6 @@
 ﻿namespace Warehouse.Controllers.Admin
 {
-    class AdminController : BaseController
+    public class AdminController : BaseController
     {
         private IAdminControllerListener m_listener;
         private Common.Types.Topology m_currentTopology;
@@ -77,6 +77,39 @@
         {
             m_currentTopology.decreaseSizeX();
             m_listener.onCurrentTopologyUpdate(m_currentTopology);
+        }
+
+        public void addNewShelf(string name, int length, int width, int height, int weight, int levels)
+        {
+            m_db.addNewShelf(name, length, width, height, weight, levels);
+            m_listener.onNewShelfAdded();
+        }
+
+        public void refreshShelfList()
+        {
+            var list = m_db.getShelfList();
+            m_listener.onShelfListRefresh(list);
+        }
+
+        public Common.Types.Shelf getShelfByID(int id)
+        {
+            return m_db.getShelfByID(id);
+        }
+
+        public void addShelfToTopology(int shelfID, int x, int y)
+        {
+            if (m_currentTopology.addShelf(shelfID, x, y))
+            {
+                m_listener.onCurrentTopologyUpdate(m_currentTopology);
+            }
+        }
+
+        public void removeShelfFromTopology(int x, int y)
+        {
+            if (m_currentTopology.removeShelf(x, y))
+            {
+                m_listener.onCurrentTopologyUpdate(m_currentTopology);
+            }
         }
     }
 }

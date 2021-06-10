@@ -274,5 +274,84 @@ namespace PGPresentation
 
             return result;
         }
+
+        public void addNewShelf(string name, int length, int width, int height, int weight, int levels)
+        {
+            string sql = "INSERT INTO shelf(name, length, width, height, weight, levels) VALUES(@name, @length, @width, @height, @weight, @levels)";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("name", name);
+                cmd.Parameters.AddWithValue("length", length);
+                cmd.Parameters.AddWithValue("width", width);
+                cmd.Parameters.AddWithValue("height", height);
+                cmd.Parameters.AddWithValue("weight", weight);
+                cmd.Parameters.AddWithValue("levels", levels);
+
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public List<Shelf> getShelfList()
+        {
+            List<Shelf> result = new List<Shelf>();
+
+            string sql = "SELECT * FROM shelf";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                var data = cmd.ExecuteReader();
+
+                while (data.Read())
+                {
+                    Shelf shelf = new Shelf();
+
+                    shelf.id = data.GetInt32(0);
+                    shelf.name = data.GetString(1);
+                    shelf.length = data.GetInt32(2);
+                    shelf.width = data.GetInt32(3);
+                    shelf.height = data.GetInt32(4);
+                    shelf.weight = data.GetInt32(5);
+                    shelf.levels = data.GetInt32(6);
+
+                    result.Add(shelf);
+                }
+
+                data.Close();
+            }
+
+            return result;
+        }
+
+        public Common.Types.Shelf getShelfByID(int id)
+        {
+            Shelf shelf = null;
+
+            string sql = "SELECT * FROM shelf WHERE id=@id";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("id", id);
+
+                var data = cmd.ExecuteReader();
+
+                if (data.Read())
+                {
+                    shelf = new Shelf();
+
+                    shelf.id = data.GetInt32(0);
+                    shelf.name = data.GetString(1);
+                    shelf.length = data.GetInt32(2);
+                    shelf.width = data.GetInt32(3);
+                    shelf.height = data.GetInt32(4);
+                    shelf.weight = data.GetInt32(5);
+                    shelf.levels = data.GetInt32(6);
+                }
+
+                data.Close();
+            }
+
+            return shelf;
+        }
     }
 }

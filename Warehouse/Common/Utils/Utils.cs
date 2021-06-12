@@ -30,5 +30,9 @@ namespace Common
             }
             return true;
         }
+        static public bool getIDFromString(string str, out int value)
+        {
+            return int.TryParse(str.Substring(0, str.IndexOf(":")), out value);
+        }
     }
 }

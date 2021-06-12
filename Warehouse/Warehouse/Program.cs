@@ -14,8 +14,8 @@ namespace Warehouse
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            //Application.Run(new Warehouse.Views.Login.LoginForm());
-            Application.Run(new Warehouse.Views.General.GeneralForm());
+            Application.Run(new Warehouse.Views.Login.LoginForm());
+            //Application.Run(new Warehouse.Views.General.GeneralForm());
         }
     }
 }

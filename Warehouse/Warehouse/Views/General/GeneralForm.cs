@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Windows.Forms;
+using Warehouse.Controllers.General;
 
 namespace Warehouse.Views.General
 {
-    public partial class GeneralForm : Form
+    public partial class GeneralForm : Form, IGeneralControllerListener
     {
+        private GeneralController m_ctrl;
         public GeneralForm()
         {
             InitializeComponent();
+            m_ctrl = new GeneralController(this);
         }
 
         private void openDialog(Form dialog)
@@ -35,6 +38,12 @@ namespace Warehouse.Views.General
         {
             // open form to create new action
             openDialog(new NewOrderForm());
+        }
+
+        private void GeneralForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            m_ctrl.Dispose();
+            m_ctrl = null;
         }
     }
 }

@@ -99,6 +99,7 @@ namespace PGPresentation
                     result.username = data.GetString(1);
                     result.password_hash = data.IsDBNull(2) ? "" : data.GetString(2);
                     result.isActive = data.GetBoolean(3);
+                    result.accessLevel = data.GetInt32(4);
                 }
                 data.Close();
                 return result;
@@ -387,6 +388,52 @@ namespace PGPresentation
 
                 cmd.ExecuteNonQuery();
             }
+        }
+
+        public List<Identificator> getRoomsIdentificatorList()
+        {
+            List<Identificator> result = new List<Identificator>();
+
+            string sql = "SELECT id, name FROM room";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                var data = cmd.ExecuteReader();
+
+                while (data.Read())
+                {
+                    Identificator id = new Identificator();
+
+                    id.ID = data.GetInt32(0);
+                    id.name = data.GetString(1);
+
+                    result.Add(id);
+                }
+
+                data.Close();
+            }
+
+            return result;
+        }
+
+        public string getTopologyByID(int id)
+        {
+            string result = "";
+            string sql = "SELECT topology FROM room WHERE id=@id";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("id", id);
+
+                var data = cmd.ExecuteReader();
+                if (data.Read())
+                {
+                    result = data.GetString(0);
+                }
+                data.Close();
+            }
+
+            return result;
         }
     }
 }

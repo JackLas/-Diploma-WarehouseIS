@@ -142,6 +142,7 @@ namespace Warehouse.Views.General
             this.cb_currentWH.Name = "cb_currentWH";
             this.cb_currentWH.Size = new System.Drawing.Size(772, 23);
             this.cb_currentWH.TabIndex = 2;
+            this.cb_currentWH.SelectedIndexChanged += new System.EventHandler(this.cb_currentWH_SelectedIndexChanged);
             // 
             // GeneralForm
             // 
@@ -156,6 +157,7 @@ namespace Warehouse.Views.General
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Склад - Головна";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.GeneralForm_FormClosed);
+            this.Load += new System.EventHandler(this.GeneralForm_Load);
             this.tabs.ResumeLayout(false);
             this.tp_items.ResumeLayout(false);
             this.tp_items.PerformLayout();

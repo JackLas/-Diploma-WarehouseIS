@@ -23,22 +23,26 @@ namespace Common.Interfaces
 
         public abstract void addEmployee(string fullname, string phone, string address, int accountID);
 
-        public abstract List<Common.Types.Employee> getEmployees(string search);
+        public abstract List<Types.Employee> getEmployees(string search);
 
-        public abstract Common.Types.Employee getEmployeeByID(int id);
+        public abstract Types.Employee getEmployeeByID(int id);
 
         public abstract void addClient(string name, string address, string info);
 
-        public abstract List<Common.Types.Client> getClients(string search);
+        public abstract List<Types.Client> getClients(string search);
 
-        public abstract Common.Types.Client getClientByID(int id);
+        public abstract Types.Client getClientByID(int id);
 
         public abstract void addNewShelf(string name, int length, int width, int height, int weight, int levels);
         
-        public abstract List<Common.Types.Shelf> getShelfList();
+        public abstract List<Types.Shelf> getShelfList();
 
-        public abstract Common.Types.Shelf getShelfByID(int id);
+        public abstract Types.Shelf getShelfByID(int id);
 
         public abstract void saveTopology(string name, string json);
+
+        public abstract List<Types.Identificator> getRoomsIdentificatorList();
+
+        public abstract string getTopologyByID(int id);
     }
 }

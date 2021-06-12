@@ -1,16 +1,45 @@
 ﻿using System;
 using System.Windows.Forms;
 using Warehouse.Controllers.General;
+using System.Collections.Generic;
 
 namespace Warehouse.Views.General
 {
     public partial class GeneralForm : Form, IGeneralControllerListener
     {
         private GeneralController m_ctrl;
-        public GeneralForm()
+        private Topology.TopologyBuilder m_topologyBuilder;
+        public GeneralForm(int userID, int accessLevel)
         {
             InitializeComponent();
-            m_ctrl = new GeneralController(this);
+            m_ctrl = new GeneralController(this, userID, accessLevel);
+            m_topologyBuilder = new Topology.TopologyBuilder();
+        }
+
+        private void GeneralForm_Load(object sender, EventArgs e)
+        {
+            m_topologyBuilder.setDefaultSettings(dgv_topologyWH);
+            m_ctrl.refreshWarehouseList();
+        }
+
+        private void GeneralForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            m_ctrl.Dispose();
+            m_ctrl = null;
+        }
+
+        public void onAccessLevelUpdate(Common.Types.Posts post)
+        {
+            switch (post)
+            {
+                case Common.Types.Posts.ADMIN:
+                    // tabs.TabPages["tp_admin"].Show();
+                    break;
+                case Common.Types.Posts.WORKER:
+                    tabs.TabPages.RemoveByKey("tp_admin");
+                    break;
+                default: break;
+            }
         }
 
         private void openDialog(Form dialog)
@@ -36,14 +65,31 @@ namespace Warehouse.Views.General
 
         private void btn_new_order_Click(object sender, EventArgs e)
         {
-            // open form to create new action
             openDialog(new NewOrderForm());
         }
 
-        private void GeneralForm_FormClosed(object sender, FormClosedEventArgs e)
+        public void onWarehouseListUpdate(List<Common.Types.Identificator> list)
         {
-            m_ctrl.Dispose();
-            m_ctrl = null;
+            foreach (var id in list)
+            {
+                cb_currentWH.Items.Add(id);
+            }
+        }
+
+        private void cb_currentWH_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cb_currentWH.SelectedIndex == -1) return;
+
+            int id = -1;
+            if (Common.Utils.getIDFromString(cb_currentWH.SelectedItem.ToString(), out id))
+            {
+                m_ctrl.loadWarehouseTopology(id);
+            }
+        }
+
+        public void onCurrentTopologyUpdate(Common.Types.Topology topology)
+        {
+            m_topologyBuilder.rebuild(topology, dgv_topologyWH);
         }
     }
 }

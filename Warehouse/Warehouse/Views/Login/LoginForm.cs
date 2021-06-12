@@ -24,7 +24,7 @@ namespace Warehouse.Views.Login
             this.Hide();
             m_ctrl.Dispose();
             m_ctrl = null;
-            Form general = new Warehouse.Views.General.GeneralForm();
+            Form general = new Warehouse.Views.General.GeneralForm(account.id, account.accessLevel);
             general.ShowDialog();
             this.Close();
         }

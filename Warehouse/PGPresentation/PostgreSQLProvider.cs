@@ -8,6 +8,7 @@ namespace PGPresentation
     public class PostgreSQLProvider : IDBProvider, System.IDisposable
     {
         private NpgsqlConnection m_db;
+        private System.Action m_reconnectCallback;
 
         public PostgreSQLProvider(string ip, string port)
         {
@@ -16,9 +17,30 @@ namespace PGPresentation
             str.Port = int.Parse(port);
             str.Username = "postgres";
             str.Database = "Warehouse";
+            str.KeepAlive = 5;
+            str.Timeout = 60;
             str.ApplicationName = "DBG"; // todo: remove
 
             m_db = new NpgsqlConnection(str.ToString());
+
+            m_db.StateChange += M_db_StateChange;
+        }
+
+        private void M_db_StateChange(object sender, System.Data.StateChangeEventArgs e)
+        {
+            if (e.CurrentState == System.Data.ConnectionState.Broken)
+            {
+                m_db.Open();
+                if (m_reconnectCallback != null)
+                {
+                    m_reconnectCallback();
+                }
+            }
+        }
+
+        public void subscribeOnReconnect(System.Action callback)
+        {
+            m_reconnectCallback = callback;
         }
 
         public void Dispose()
@@ -352,6 +374,19 @@ namespace PGPresentation
             }
 
             return shelf;
+        }
+
+        public void saveTopology(string name, string json)
+        {
+            string sql = "INSERT INTO room(name, topology) VALUES (@name, @topology)";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("name", name);
+                cmd.Parameters.AddWithValue("topology", json);
+
+                cmd.ExecuteNonQuery();
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Windows.Forms;
+using System.Drawing;
 
 namespace Warehouse.Views.Topology
 {
@@ -6,6 +7,28 @@ namespace Warehouse.Views.Topology
     {
         private const string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         private const int cellSize = 50;
+        private DataGridViewCellStyle m_shelfCell;
+
+        public TopologyBuilder()
+        {
+            m_shelfCell = new DataGridViewCellStyle();
+            m_shelfCell.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            m_shelfCell.BackColor = Color.Blue;
+            m_shelfCell.ForeColor = Color.White;
+        }
+
+        public void setDefaultSettings(DataGridView grid)
+        {
+            grid.AllowUserToAddRows = false;
+            grid.AllowUserToDeleteRows = false;
+            grid.AllowUserToResizeColumns = false;
+            grid.AllowUserToResizeRows = false;
+            grid.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            grid.MultiSelect = false;
+            grid.ReadOnly = true;
+            grid.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
+            grid.SelectionMode = DataGridViewSelectionMode.CellSelect;
+        }
 
         public void rebuild(Common.Types.Topology input, DataGridView output)
         {
@@ -17,12 +40,18 @@ namespace Warehouse.Views.Topology
                 for (int x = 0; x < input.getSizeX(); x++)
                 {
                     DataGridViewCell cell = new DataGridViewTextBoxCell();
+                    cell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
                     //cell.Value = normalizeToAlphabet(x) + y.ToString(); // dbg
                     output[x, y] = cell;
-                    output.Columns[x].HeaderText = normalizeToAlphabet(x);
-                    output.Columns[x].SortMode = DataGridViewColumnSortMode.NotSortable;
-                    output.Columns[x].Width = cellSize;
-                    output.Columns[x].MinimumWidth = cellSize;
+
+                    if (y == 0)
+                    {
+                        output.Columns[x].HeaderText = normalizeToAlphabet(x);
+                        output.Columns[x].HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                        output.Columns[x].SortMode = DataGridViewColumnSortMode.NotSortable;
+                        output.Columns[x].Width = cellSize;
+                        output.Columns[x].MinimumWidth = cellSize;
+                    }
                 }
                 output.Rows[y].HeaderCell.Value = y.ToString();
                 output.Rows[y].Height = cellSize;
@@ -31,7 +60,9 @@ namespace Warehouse.Views.Topology
 
             foreach (var shelf in input.getShelfList())
             {
-                output[shelf.x, shelf.y].Style.BackColor = System.Drawing.Color.FromArgb(0, 0, 255);
+                var cell = output[shelf.x, shelf.y];
+                cell.Style = m_shelfCell.Clone();
+                cell.Value = shelf.shelfID.ToString();
             }
 
             output.ClearSelection();

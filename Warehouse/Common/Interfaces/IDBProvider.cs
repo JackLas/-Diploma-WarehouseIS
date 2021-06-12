@@ -1,11 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Common.Interfaces
 {
     public interface IDBProvider
     {
         public abstract void open();
+
         public abstract void close();
+
+        public void subscribeOnReconnect(Action callback);
 
         public abstract Types.Account getUserAccountData(string username);
 
@@ -34,5 +38,7 @@ namespace Common.Interfaces
         public abstract List<Common.Types.Shelf> getShelfList();
 
         public abstract Common.Types.Shelf getShelfByID(int id);
+
+        public abstract void saveTopology(string name, string json);
     }
 }

@@ -4,9 +4,9 @@ namespace Common.Types
 {
     public class Topology
     {
-        private int sizeX;
-        private int sizeY;
-        private List<ShelfPoint> shelfList;
+        public int sizeX { get; set; }
+        public int sizeY { get; set; }
+        public List<ShelfPoint> shelfList { get; set; }
 
         public Topology()
         {

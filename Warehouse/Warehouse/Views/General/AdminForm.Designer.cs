@@ -65,6 +65,7 @@ namespace Warehouse.Views.General
             this.lbl_client_name = new System.Windows.Forms.Label();
             this.tb_search_client = new System.Windows.Forms.TextBox();
             this.lb_clients = new System.Windows.Forms.ListBox();
+            this.btn_clear_warehouse = new System.Windows.Forms.Button();
             this.tabs.SuspendLayout();
             this.tp_topology.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgv_topology)).BeginInit();
@@ -85,6 +86,7 @@ namespace Warehouse.Views.General
             // 
             // tp_topology
             // 
+            this.tp_topology.Controls.Add(this.btn_clear_warehouse);
             this.tp_topology.Controls.Add(this.tb_warehouse_name);
             this.tp_topology.Controls.Add(this.label6);
             this.tp_topology.Controls.Add(this.btn_topology_delete_column);
@@ -435,6 +437,16 @@ namespace Warehouse.Views.General
             this.lb_clients.TabIndex = 2;
             this.lb_clients.SelectedIndexChanged += new System.EventHandler(this.lb_clients_SelectedIndexChanged);
             // 
+            // btn_clear_warehouse
+            // 
+            this.btn_clear_warehouse.Location = new System.Drawing.Point(575, 600);
+            this.btn_clear_warehouse.Name = "btn_clear_warehouse";
+            this.btn_clear_warehouse.Size = new System.Drawing.Size(113, 23);
+            this.btn_clear_warehouse.TabIndex = 10;
+            this.btn_clear_warehouse.Text = "Очистити";
+            this.btn_clear_warehouse.UseVisualStyleBackColor = true;
+            this.btn_clear_warehouse.Click += new System.EventHandler(this.btn_clear_warehouse_Click);
+            // 
             // AdminForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -497,5 +509,6 @@ namespace Warehouse.Views.General
         private System.Windows.Forms.Button btn_topology_add_row;
         private System.Windows.Forms.TextBox tb_warehouse_name;
         private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Button btn_clear_warehouse;
     }
 }

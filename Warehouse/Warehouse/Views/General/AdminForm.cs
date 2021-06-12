@@ -24,6 +24,8 @@ namespace Warehouse.Views.General
 
         private void AdminForm_Load(object sender, EventArgs e)
         {
+            m_topologyBuilder.setDefaultSettings(dgv_topology);
+
             cb_empl_post.Items.Clear();
             cb_empl_post.Items.Add("Адміністратор");
             cb_empl_post.Items.Add("Робітник складу");
@@ -266,7 +268,20 @@ namespace Warehouse.Views.General
 
         private void btn_save_warehouse_Click(object sender, EventArgs e)
         {
+            if (tb_warehouse_name.Text.Length == 0)
+            {
+                MessageBox.Show("Введіть назву складу");
+            }
+            else
+            {
+                m_ctrl.saveTopology(tb_warehouse_name.Text);
+            }
+        }
 
+        public void onTopologySaved()
+        {
+            MessageBox.Show("Топологія збережена");
+            btn_clear_warehouse_Click(this, null);
         }
 
         private void dgv_topology_Click(object sender, EventArgs e)
@@ -292,6 +307,21 @@ namespace Warehouse.Views.General
             }
 
             dgv_topology.ClearSelection();
+        }
+
+        public void handleNotification(string msg)
+        {
+            MessageBox.Show(msg);
+        }
+
+        private void btn_clear_warehouse_Click(object sender, EventArgs e)
+        {
+            dgv_topology.ColumnCount = 0;
+            dgv_topology.RowCount = 0;
+            lb_shelf.ClearSelected();
+            tb_warehouse_name.Clear();
+
+            m_ctrl.clearTopology();
         }
     }
 }

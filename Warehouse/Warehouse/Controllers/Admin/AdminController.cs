@@ -1,4 +1,6 @@
-﻿namespace Warehouse.Controllers.Admin
+﻿using System.Text.Json;
+
+namespace Warehouse.Controllers.Admin
 {
     public class AdminController : BaseController
     {
@@ -9,6 +11,12 @@
         {
             m_listener = listener;
             m_currentTopology = new Common.Types.Topology();
+            m_db.subscribeOnReconnect(this.onReconnect);
+        }
+
+        public void onReconnect()
+        {
+            m_listener.handleNotification("Reconnect");
         }
 
         public void addEmployee(string name, int post, string address, string phone, string login)
@@ -103,13 +111,24 @@
                 m_listener.onCurrentTopologyUpdate(m_currentTopology);
             }
         }
-
         public void removeShelfFromTopology(int x, int y)
         {
             if (m_currentTopology.removeShelf(x, y))
             {
                 m_listener.onCurrentTopologyUpdate(m_currentTopology);
             }
+        }
+
+        public void saveTopology(string name)
+        {
+            string json = JsonSerializer.Serialize(m_currentTopology);
+            m_db.saveTopology(name, json);
+            m_listener.onTopologySaved();
+        }
+
+        public void clearTopology()
+        {
+            m_currentTopology = new Common.Types.Topology();
         }
     }
 }

@@ -4,6 +4,8 @@ namespace Warehouse.Controllers.Admin
 {
     public interface IAdminControllerListener
     {
+        public abstract void handleNotification(string msg);
+
         public abstract void onLoginAlreadyExists();
 
         public abstract void onEmployeeAdded();
@@ -19,5 +21,7 @@ namespace Warehouse.Controllers.Admin
         public abstract void onNewShelfAdded();
 
         public abstract void onShelfListRefresh(List<Common.Types.Shelf> shelfList);
+
+        public abstract void onTopologySaved();
     }
 }

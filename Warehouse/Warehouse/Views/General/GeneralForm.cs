@@ -2,11 +2,13 @@
 using System.Windows.Forms;
 using Warehouse.Controllers.General;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Warehouse.Views.General
 {
     public partial class GeneralForm : Form, IGeneralControllerListener
     {
+        private const string lastModeFile = "lastmode.dat";
         private GeneralController m_ctrl;
         private Topology.TopologyBuilder m_topologyBuilder;
         public GeneralForm(int userID, int accessLevel)
@@ -20,12 +22,40 @@ namespace Warehouse.Views.General
         {
             m_topologyBuilder.setDefaultSettings(dgv_topologyWH);
             m_ctrl.refreshWarehouseList();
+
+            if (File.Exists(lastModeFile))
+            {
+                StreamReader file = new StreamReader(lastModeFile);
+                int id = -1;
+                int.TryParse(file.ReadLine(), out id);
+                for (int i = 0; i < cb_currentWH.Items.Count; i++)
+                {
+                    int listID = -1;
+                    if (Common.Utils.getIDFromString(cb_currentWH.Items[i].ToString(), out listID))
+                    {
+                        if (id == listID)
+                        {
+                            cb_currentWH.SelectedIndex = i;
+                            break;
+                        }
+                    }
+                }               
+                file.Close();
+            }
         }
 
-        private void GeneralForm_FormClosed(object sender, FormClosedEventArgs e)
+        private void GeneralForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             m_ctrl.Dispose();
             m_ctrl = null;
+            int lastMode = getSelectWarehouseID();
+            if (lastMode != -1)
+            {
+                StreamWriter file = new StreamWriter(lastModeFile, false);
+                file.Write(lastMode.ToString());
+                file.Flush();
+                file.Close();
+            }
         }
 
         public void onAccessLevelUpdate(Common.Types.Posts post)
@@ -78,13 +108,21 @@ namespace Warehouse.Views.General
 
         private void cb_currentWH_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (cb_currentWH.SelectedIndex == -1) return;
-
-            int id = -1;
-            if (Common.Utils.getIDFromString(cb_currentWH.SelectedItem.ToString(), out id))
+            int id = getSelectWarehouseID();
+            if (id != -1)
             {
                 m_ctrl.loadWarehouseTopology(id);
             }
+        }
+
+        private int getSelectWarehouseID()
+        {
+            int id = -1;
+            if (cb_currentWH.SelectedIndex != -1)
+            {
+                Common.Utils.getIDFromString(cb_currentWH.SelectedItem.ToString(), out id);
+            }
+            return id;
         }
 
         public void onCurrentTopologyUpdate(Common.Types.Topology topology)

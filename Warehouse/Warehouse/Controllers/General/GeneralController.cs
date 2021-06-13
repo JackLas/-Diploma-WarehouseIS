@@ -1,13 +1,16 @@
-﻿using System.Text.Json;
+﻿using Common.Types;
+using System.Collections.Generic;
+using System.Text.Json;
 
 namespace Warehouse.Controllers.General
 {
-    public class GeneralController : BaseController
+    public class GeneralController : BaseController, IOrderController
     {
         private IGeneralControllerListener m_listener;
         private int m_currentUserID;
         private int m_currentUserAccess;
-        private Common.Types.Topology m_currentTopology;
+        private Topology m_currentTopology;
+        private int m_warehouseID;
         private bool m_isDBOpened;
 
         public GeneralController(IGeneralControllerListener listener, int userID, int userLevel) : base()
@@ -16,6 +19,7 @@ namespace Warehouse.Controllers.General
             m_currentUserID = userID;
             m_currentUserAccess = userLevel;
             m_isDBOpened = true;
+            m_warehouseID = -1;
 
             m_listener.onAccessLevelUpdate((Common.Types.Posts)m_currentUserAccess);
         }
@@ -41,6 +45,7 @@ namespace Warehouse.Controllers.General
 
         public void loadWarehouseTopology(int id)
         {
+            m_warehouseID = id;
             string json = m_db.getTopologyByID(id);
             m_currentTopology = JsonSerializer.Deserialize<Common.Types.Topology>(json);
             m_listener.onCurrentTopologyUpdate(m_currentTopology);
@@ -50,6 +55,26 @@ namespace Warehouse.Controllers.General
         {
             var list = m_db.getRoomsIdentificatorList();
             m_listener.onWarehouseListUpdate(list);
+        }
+
+        public void refreshOrderList()
+        {
+            List<Order> orderlist = m_db.getOrders(m_warehouseID);
+            m_listener.onOrderListUpdate(orderlist);
+        }
+        public void applyOrder(int orderID)
+        {
+
+        }
+
+        public void cancelOrder(int orderID)
+        {
+
+        }
+
+        public OrderDescriptionData getOrderDescription(int orderID)
+        {
+            return m_db.getOrderDescription(orderID);
         }
     }
 }

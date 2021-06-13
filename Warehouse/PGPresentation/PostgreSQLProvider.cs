@@ -514,5 +514,97 @@ namespace PGPresentation
                 cmd.ExecuteNonQuery();
             }
         }
+
+        public List<Order> getOrders(int roomID)
+        {
+            List<Order> result = new List<Order>();
+
+            string sql = "SELECT orderlist.id, clients.title, orderlist.type FROM orderlist INNER JOIN clients ON orderlist.client_id=clients.id WHERE room_id=@roomID ORDER BY orderlist.id ASC";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("roomID", roomID);
+
+                var data = cmd.ExecuteReader();
+
+                while(data.Read())
+                {
+                    Order order = new Order();
+
+                    order.id = data.GetInt32(0);
+                    order.clientName = data.GetString(1);
+                    order.type = (OrderType)data.GetInt32(2);
+
+                    result.Add(order);
+                }
+
+                data.Close();
+            }
+
+            return result;
+        }
+
+        private OrderItem getItemByID(int itemID, string tableName)
+        {
+            OrderItem result = null;
+            string sql = "SELECT " + tableName + ".*, item.name FROM " + tableName + " INNER JOIN item ON item_id=item.id WHERE "+tableName+".id=@itemID";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("itemID", itemID);
+
+                var data = cmd.ExecuteReader();
+
+                if (data.Read())
+                {
+                    result = new OrderItem();
+                    result.id = data.GetInt32(0);
+                    result.name = data.GetString(6);
+                    result.pos.x = data.GetInt32(3);
+                    result.pos.y = data.GetInt32(4);
+                    result.level = data.GetInt32(5);
+                }
+
+                data.Close();
+            }
+
+            return result;
+        }
+
+        public OrderDescriptionData getOrderDescription(int orderID)
+        {
+            OrderDescriptionData result = new OrderDescriptionData();
+            int[] items = {};
+            string itemsTable = "";
+
+            string sql = "SELECT orderlist.id, orderlist.items, clients.title, clients.address, orderlist.type FROM orderlist INNER JOIN clients ON orderlist.client_id=clients.id WHERE orderlist.id=@orderID";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("orderID", orderID);
+
+                var data = cmd.ExecuteReader();
+
+                if (data.Read())
+                {
+                    result.id = data.GetInt32(0);
+                    items = data.GetFieldValue<int[]>(1);
+                    result.client.title = data.GetString(2);
+                    result.client.address = data.GetString(3);
+                    itemsTable = ((OrderType)data.GetInt32(4) == OrderType.RECEIVE ? "queue_itemlist" : "itemlist");
+                }
+
+                data.Close();
+            }
+
+            
+            foreach (int i in items)
+            {
+                var item = getItemByID(i, itemsTable);
+                result.items.Add(item);
+            }
+
+            return result;
+        }
     }
 }

@@ -135,6 +135,9 @@ namespace Warehouse.Views.General
             if (Common.Utils.getIDFromString(cb_currentWH.SelectedItem.ToString(), out id))
             {
                 openDialog(new NewOrderForm(m_ctrl, id));
+
+                lb_orders.ClearSelected();
+                m_ctrl.refreshOrderList();
             }            
         }
 
@@ -153,6 +156,7 @@ namespace Warehouse.Views.General
             if (id != -1)
             {
                 m_ctrl.loadWarehouseTopology(id);
+                m_ctrl.refreshOrderList();
             }
         }
 
@@ -169,6 +173,32 @@ namespace Warehouse.Views.General
         public void onCurrentTopologyUpdate(Common.Types.Topology topology)
         {
             m_topologyBuilder.rebuild(topology, dgv_topologyWH);
+        }
+
+        public void onOrderListUpdate(List<Common.Types.Order> list)
+        {
+            lb_orders.Items.Clear();
+            foreach (var order in list)
+            {
+                lb_orders.Items.Add(order.ToString());
+            }
+        }
+
+        private void lb_items_DoubleClick(object sender, EventArgs e)
+        {
+            if (lb_items.SelectedIndex == -1) return;
+        }
+
+        private void lb_orders_DoubleClick(object sender, EventArgs e)
+        {
+            if (lb_orders.SelectedIndex == -1) return;
+
+            int orderID = -1;
+            if (Common.Utils.getIDFromString(lb_orders.SelectedItem.ToString(), out orderID))
+            {
+                Form form = new OrderForm(orderID, lb_orders.SelectedItem.ToString(), m_ctrl);
+                form.Show();
+            }
         }
     }
 }

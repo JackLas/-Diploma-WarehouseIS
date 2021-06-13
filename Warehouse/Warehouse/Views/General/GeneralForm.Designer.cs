@@ -77,6 +77,7 @@ namespace Warehouse.Views.General
             this.lb_items.Name = "lb_items";
             this.lb_items.Size = new System.Drawing.Size(442, 589);
             this.lb_items.TabIndex = 1;
+            this.lb_items.DoubleClick += new System.EventHandler(this.lb_items_DoubleClick);
             // 
             // tb_item_search
             // 
@@ -116,6 +117,7 @@ namespace Warehouse.Views.General
             this.lb_orders.Name = "lb_orders";
             this.lb_orders.Size = new System.Drawing.Size(442, 589);
             this.lb_orders.TabIndex = 0;
+            this.lb_orders.DoubleClick += new System.EventHandler(this.lb_orders_DoubleClick);
             // 
             // tp_admin
             // 

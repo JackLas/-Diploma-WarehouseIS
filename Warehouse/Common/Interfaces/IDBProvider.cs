@@ -52,5 +52,9 @@ namespace Common.Interfaces
         public abstract int addItemToReceiveQueue(int itemID, int roomID, int shelfX, int shelfY, int shelfLvl);
 
         public abstract void createOrder(int clientID, int roomID, List<int> items, Types.OrderType type);
+
+        public abstract List<Types.Order> getOrders(int roomID);
+
+        public abstract Types.OrderDescriptionData getOrderDescription(int orderID); 
     }
 }

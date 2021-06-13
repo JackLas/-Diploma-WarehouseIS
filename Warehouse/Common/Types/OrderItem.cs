@@ -2,6 +2,10 @@
 {
     public class OrderItem
     {
+        public OrderItem()
+        {
+            pos = new Vec();
+        }
         public int id { get; set; }
         public string name { get; set; }
         public Vec pos { get; set; }

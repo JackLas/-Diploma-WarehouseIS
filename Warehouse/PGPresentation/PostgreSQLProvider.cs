@@ -1,6 +1,7 @@
 ﻿using Common.Interfaces;
 using Common.Types;
 using Npgsql;
+using System;
 using System.Collections.Generic;
 
 namespace PGPresentation
@@ -56,7 +57,7 @@ namespace PGPresentation
         public void close()
         {
             m_db.Close();
-            m_db.Dispose();
+            //m_db.Dispose();
         }
 
         public Account getUserAccountData(string username)
@@ -76,6 +77,7 @@ namespace PGPresentation
                     result.username = data.GetString(1);
                     result.password_hash = data.IsDBNull(2) ? "" : data.GetString(2);
                     result.isActive = data.GetBoolean(3);
+                    result.accessLevel = data.GetInt32(4);
                 }
                 data.Close();
                 return result;
@@ -434,6 +436,83 @@ namespace PGPresentation
             }
 
             return result;
+        }
+
+        public int getItemID(string name, int length, int width, int height, int weight)
+        {
+            string sql = "SELECT id FROM item WHERE name=@name AND length=@length AND width=@width AND height=@height AND weight=@weight";
+
+            int id = -1;
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("name", name);
+                cmd.Parameters.AddWithValue("length", length);
+                cmd.Parameters.AddWithValue("width", width);
+                cmd.Parameters.AddWithValue("height", height);
+                cmd.Parameters.AddWithValue("weight", weight);
+
+                var data = cmd.ExecuteReader();
+
+                if (data.Read())
+                {
+                    id = data.GetInt32(0);
+                }
+
+                data.Close();
+            }
+
+            return id;
+        }
+
+        public void createItem(string name, int length, int width, int height, int weight)
+        {
+            string sql = "INSERT INTO item (name, length, width, height, weight) VALUES (@name, @length, @width, @height, @weight)";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("name", name);
+                cmd.Parameters.AddWithValue("length", length);
+                cmd.Parameters.AddWithValue("width", width);
+                cmd.Parameters.AddWithValue("height", height);
+                cmd.Parameters.AddWithValue("weight", weight);
+
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public int addItemToReceiveQueue(int itemID, int roomID, int shelfX, int shelfY, int shelfLvl)
+        {
+            string sql = "INSERT INTO queue_itemlist(item_id, room_id, shelf_pos_x, shelf_pos_y, shelf_level) VALUES (@itemID, @roomID, @shelfX, @shelfY, @shelfLvl) RETURNING id";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("itemID", itemID);
+                cmd.Parameters.AddWithValue("roomID", roomID);
+                cmd.Parameters.AddWithValue("shelfX", shelfX);
+                cmd.Parameters.AddWithValue("shelfY", shelfY);
+                cmd.Parameters.AddWithValue("shelfLvl", shelfLvl);
+
+                return Convert.ToInt32(cmd.ExecuteScalar());
+            }
+        }
+        
+        public void createOrder(int clientID, int roomID, List<int> items, OrderType type)
+        {
+            string sql = "INSERT INTO orderlist(client_id, type, room_id, items) VALUES (@clientID, @type, @roomID, @items)";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("clientID", clientID);
+                cmd.Parameters.AddWithValue("type", (int)type);
+                cmd.Parameters.AddWithValue("roomID", roomID);
+
+                var itemsParam = new NpgsqlParameter("items", NpgsqlTypes.NpgsqlDbType.Array | NpgsqlTypes.NpgsqlDbType.Integer);
+                itemsParam.Value = items.ToArray();
+                cmd.Parameters.Add(itemsParam);
+
+                cmd.ExecuteNonQuery();
+            }
         }
     }
 }

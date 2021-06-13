@@ -5,7 +5,7 @@ namespace Warehouse.Views.Topology
 {
     public class TopologyBuilder
     {
-        private const string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        private static string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         private const int cellSize = 50;
         private DataGridViewCellStyle m_shelfCell;
 
@@ -28,6 +28,21 @@ namespace Warehouse.Views.Topology
             grid.ReadOnly = true;
             grid.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
             grid.SelectionMode = DataGridViewSelectionMode.CellSelect;
+
+            grid.EnableHeadersVisualStyles = false;
+
+            grid.DefaultCellStyle.SelectionBackColor = Color.Transparent;
+            grid.DefaultCellStyle.SelectionForeColor = Color.Transparent;
+
+            var rowDefStyle = new DataGridViewCellStyle();
+            rowDefStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            rowDefStyle.BackColor = Color.LightGoldenrodYellow;
+            grid.RowHeadersDefaultCellStyle = rowDefStyle;
+
+            var colDefStyle = new DataGridViewCellStyle();
+            colDefStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            colDefStyle.BackColor = Color.LightGoldenrodYellow;
+            grid.ColumnHeadersDefaultCellStyle = colDefStyle;
         }
 
         public void rebuild(Common.Types.Topology input, DataGridView output)
@@ -47,7 +62,6 @@ namespace Warehouse.Views.Topology
                     if (y == 0)
                     {
                         output.Columns[x].HeaderText = normalizeToAlphabet(x);
-                        output.Columns[x].HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
                         output.Columns[x].SortMode = DataGridViewColumnSortMode.NotSortable;
                         output.Columns[x].Width = cellSize;
                         output.Columns[x].MinimumWidth = cellSize;
@@ -68,7 +82,7 @@ namespace Warehouse.Views.Topology
             output.ClearSelection();
         }
 
-        private string normalizeToAlphabet(int value)
+        private static string normalizeToAlphabet(int value)
         {
             if (value < 0) return "";
 
@@ -80,6 +94,60 @@ namespace Warehouse.Views.Topology
             {
                 return alphabet[value].ToString();
             }
+        }
+
+        private static int normilizeToNumber(string value)
+        {
+            int num = 0;
+
+            for (int i = value.Length-1; i >= 0; i--)
+            {
+                char ch = value[i];
+                int chIdx = alphabet.IndexOf(ch);
+                if (i == value.Length-1)
+                {
+                    num += chIdx;
+                }
+                else
+                {
+                    num += ((value.Length - i - 1) * alphabet.Length * (chIdx + 1));
+                }
+            }
+
+            return num;
+        }
+
+        static public Common.Types.Vec convertPosition(string pos)
+        {
+            Common.Types.Vec result = new Common.Types.Vec();
+
+            int digitSubstringBegin = -1;
+            for (int i = 0; i < pos.Length; i++)
+            {
+                if (char.IsDigit(pos[i]))
+                {
+                    digitSubstringBegin = i;
+                    break;
+                }
+            }
+
+            if (digitSubstringBegin > -1)
+            {
+                string strX = pos.Substring(0, digitSubstringBegin);
+                string strY = pos.Substring(digitSubstringBegin);
+
+                result.x = normilizeToNumber(strX);
+                int tmpY = -1;
+                int.TryParse(strY, out tmpY);
+                result.y = tmpY;
+            }
+
+            return result;
+        }
+
+        static public string convertPosition(Common.Types.Vec pos)
+        {
+            return normalizeToAlphabet(pos.x) + pos.y.ToString();
         }
     }
 }

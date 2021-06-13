@@ -83,8 +83,38 @@ namespace Warehouse.Views.General
         {
             if (e.TabPage.Name == "tp_admin")
             {
-                openDialog(new AdminForm());
+                bool isWHRestored = false;
+                int selectedWH = -1;
+                Common.Utils.getIDFromString(cb_currentWH.SelectedItem.ToString(), out selectedWH);
+
+                m_ctrl.pauseResume();
+                openDialog(new AdminForm()); // block while AdminForm is active
+                m_ctrl.pauseResume();
+
                 tabs.SelectedTab = tabs.TabPages[0];
+
+                m_ctrl.refreshWarehouseList();
+
+                for (int i = 0; i < cb_currentWH.Items.Count; i++)
+                {
+                    var str = cb_currentWH.Items[i].ToString();
+
+                    int currentWH = -1;
+                    if (Common.Utils.getIDFromString(str, out currentWH))
+                    {
+                        if (currentWH == selectedWH)
+                        {
+                            cb_currentWH.SelectedIndex = i;
+                            isWHRestored = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!isWHRestored)
+                {
+                    cb_currentWH.SelectedIndex = -1;
+                }
             }
         }
 
@@ -95,11 +125,22 @@ namespace Warehouse.Views.General
 
         private void btn_new_order_Click(object sender, EventArgs e)
         {
-            openDialog(new NewOrderForm());
+            if (cb_currentWH.SelectedIndex == -1)
+            {
+                MessageBox.Show("Склад не обрано");
+                return;
+            }
+
+            int id = -1;
+            if (Common.Utils.getIDFromString(cb_currentWH.SelectedItem.ToString(), out id))
+            {
+                openDialog(new NewOrderForm(m_ctrl, id));
+            }            
         }
 
         public void onWarehouseListUpdate(List<Common.Types.Identificator> list)
         {
+            cb_currentWH.Items.Clear();
             foreach (var id in list)
             {
                 cb_currentWH.Items.Add(id);

@@ -29,7 +29,7 @@ namespace Common.Interfaces
 
         public abstract void addClient(string name, string address, string info);
 
-        public abstract List<Types.Client> getClients(string search);
+        public abstract List<Types.Client> getClients(string search = "");
 
         public abstract Types.Client getClientByID(int id);
 
@@ -44,5 +44,13 @@ namespace Common.Interfaces
         public abstract List<Types.Identificator> getRoomsIdentificatorList();
 
         public abstract string getTopologyByID(int id);
+
+        public abstract int getItemID(string name, int length, int width, int height, int weight);
+
+        public abstract void createItem(string name, int length, int width, int height, int weight);
+
+        public abstract int addItemToReceiveQueue(int itemID, int roomID, int shelfX, int shelfY, int shelfLvl);
+
+        public abstract void createOrder(int clientID, int roomID, List<int> items, Types.OrderType type);
     }
 }

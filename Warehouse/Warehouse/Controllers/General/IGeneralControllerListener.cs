@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Warehouse.Controllers.General
 {
-    interface IGeneralControllerListener
+    public interface IGeneralControllerListener
     {
         public abstract void onAccessLevelUpdate(Posts post);
         public abstract void onWarehouseListUpdate(List<Identificator> list);

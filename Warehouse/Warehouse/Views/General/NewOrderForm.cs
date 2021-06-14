@@ -8,6 +8,9 @@ namespace Warehouse.Views.General
     {
         private Controllers.General.GeneralController m_mainCtrl;
         private Controllers.NewOrder.NewOrderController m_ctrl;
+        private bool m_isReceiveMode = true;
+
+        private Dictionary<KeyValuePair<int, int>, List<int>> m_sendItemsPosition;
 
         public NewOrderForm(Controllers.General.GeneralController ctrl, int currentWarehouseID)
         {
@@ -20,6 +23,7 @@ namespace Warehouse.Views.General
             tb_add_title.AutoCompleteMode = AutoCompleteMode.Suggest;
             tb_add_title.AutoCompleteSource = AutoCompleteSource.CustomSource;
             tb_add_title.AutoCompleteCustomSource = null;
+            m_sendItemsPosition = new Dictionary<KeyValuePair<int, int>, List<int>>();
         }
 
         private void NewOrderForm_Load(object sender, System.EventArgs e)
@@ -56,31 +60,39 @@ namespace Warehouse.Views.General
             }
 
             int length = -1;
-            if (!int.TryParse(tb_add_length.Text, out length))
-            {
-                MessageBox.Show("Перевірте формат габаритів");
-                return;
-            }
-
             int width = -1;
-            if (!int.TryParse(tb_add_width.Text, out width))
-            {
-                MessageBox.Show("Перевірте формат габаритів");
-                return;
-            }
-
             int height = -1;
-            if (!int.TryParse(tb_add_height.Text, out height))
-            {
-                MessageBox.Show("Перевірте формат габаритів");
-                return;
-            }
-
             int weight = -1;
-            if (!int.TryParse(tb_weight.Text, out weight))
+
+            if (m_isReceiveMode)
             {
-                MessageBox.Show("Перевірте формат ваги");
-                return;
+
+                if (!int.TryParse(tb_add_length.Text, out length))
+                {
+                    MessageBox.Show("Перевірте формат габаритів");
+                    return;
+                }
+
+
+                if (!int.TryParse(tb_add_width.Text, out width))
+                {
+                    MessageBox.Show("Перевірте формат габаритів");
+                    return;
+                }
+
+
+                if (!int.TryParse(tb_add_height.Text, out height))
+                {
+                    MessageBox.Show("Перевірте формат габаритів");
+                    return;
+                }
+
+
+                if (!int.TryParse(tb_weight.Text, out weight))
+                {
+                    MessageBox.Show("Перевірте формат ваги");
+                    return;
+                }
             }
 
             if (cb_shelf.SelectedIndex == -1)
@@ -95,15 +107,21 @@ namespace Warehouse.Views.General
                 return;
             }
 
-            m_ctrl.addToOrder(
-                tb_add_title.Text,
-                length,
-                width,
-                height,
-                weight,
-                Topology.TopologyBuilder.convertPosition(cb_shelf.SelectedItem.ToString()),
-                (cb_level.SelectedIndex + 1)
-            );
+            int level = -1;
+            if (int.TryParse(cb_level.SelectedItem.ToString(), out level))
+            {
+                m_ctrl.addToOrder(
+                   tb_add_title.Text,
+                   length,
+                   width,
+                   height,
+                   weight,
+                   Topology.TopologyBuilder.convertPosition(cb_shelf.SelectedItem.ToString()),
+                   level
+               );
+            }
+
+           
         }
 
         private void btn_add_clear_Click(object sender, System.EventArgs e)
@@ -122,12 +140,12 @@ namespace Warehouse.Views.General
             if (rbtn_receive.Checked)
             {
                 m_ctrl.switchMode(true);
-                tb_add_title.AutoCompleteCustomSource = null;
-
                 tb_add_height.Enabled = true;
                 tb_add_width.Enabled = true;
                 tb_add_length.Enabled = true;
                 tb_weight.Enabled = true;
+                m_isReceiveMode = true;
+                m_ctrl.refreshShelfList();
             }
         }
 
@@ -136,11 +154,16 @@ namespace Warehouse.Views.General
             if (rtbn_send.Checked)
             {
                 m_ctrl.switchMode(false);
-                m_ctrl.refreshItemsAutocomplete();
                 tb_add_height.Enabled = false;
                 tb_add_width.Enabled = false;
                 tb_add_length.Enabled = false;
                 tb_weight.Enabled = false;
+                m_isReceiveMode = false;
+                m_sendItemsPosition.Clear();
+                cb_shelf.Items.Clear();
+                cb_shelf.Text = "";
+                cb_level.Items.Clear();
+                cb_level.Text = "";
             }
         }
 
@@ -196,8 +219,29 @@ namespace Warehouse.Views.General
                 return;
             }
 
-            m_ctrl.refreshCurrentShelfLevels(Topology.TopologyBuilder.convertPosition(cb_shelf.SelectedItem.ToString()));
-            cb_shelf.SelectedIndex = -1;
+            if (m_isReceiveMode)
+            {
+                m_ctrl.refreshCurrentShelfLevels(Topology.TopologyBuilder.convertPosition(cb_shelf.SelectedItem.ToString()));
+                cb_level.Text = "";
+                cb_level.SelectedItem = -1;
+            }
+            else
+            {
+                Vec pos = Topology.TopologyBuilder.convertPosition(cb_shelf.SelectedItem.ToString());
+                List<int> levels;
+                if (m_sendItemsPosition.TryGetValue(new KeyValuePair<int, int>(pos.x, pos.y), out levels))
+                {
+                    if (levels != null)
+                    {
+                        cb_level.Items.Clear();
+                        foreach (int lvl in levels)
+                        {
+                            cb_level.Items.Add(lvl.ToString());
+                        }
+                    }
+                }
+            }
+            
         }
 
         public void onModeUpdate()
@@ -205,8 +249,70 @@ namespace Warehouse.Views.General
             btn_add_clear_Click(null, null);
         }
 
+        public void onItemNameAutocompleteUpdate(List<string> list)
+        {
+            AutoCompleteStringCollection collection = null;
+
+            if (list != null)
+            {
+                collection = new AutoCompleteStringCollection();
+                foreach (string itemName in list)
+                {
+                    collection.Add(itemName);
+                }
+            }
+
+            tb_add_title.AutoCompleteCustomSource = collection;
+        }
+
         private void tb_add_title_TextChanged(object sender, System.EventArgs e)
         {
+            m_ctrl.checkAutocomplete(tb_add_title.Text);
+        }
+
+        public void onAutocompleteMatch(List<Item> itemlist)
+        {
+            m_sendItemsPosition.Clear();
+
+            foreach (var item in itemlist)
+            {
+                List<int> levels;
+                m_sendItemsPosition.TryGetValue(new KeyValuePair<int, int>(item.shelf_pos.x, item.shelf_pos.y), out levels);
+                //{
+                    if (levels == null)
+                    {
+                        levels = new List<int>();
+                    }
+
+                    bool isLevelPresent = false;
+                    foreach (int level in levels)
+                    {
+                        if (level == item.shelf_level)
+                        {
+                            isLevelPresent = true;
+                            break;
+                        }
+                    }
+                    if (!isLevelPresent)
+                    {
+                        levels.Add(item.shelf_level);
+                        
+                    }
+                //}
+                m_sendItemsPosition[new KeyValuePair<int, int>(item.shelf_pos.x, item.shelf_pos.y)] = levels;
+            }
+
+            cb_shelf.Items.Clear();
+            foreach (var pair in m_sendItemsPosition)
+            {
+                Vec vec = new Vec();
+
+                vec.x = pair.Key.Key;
+                vec.y = pair.Key.Value;
+
+                string shelf = Topology.TopologyBuilder.convertPosition(vec);
+                cb_shelf.Items.Add(shelf);
+            }
         }
     }
 }

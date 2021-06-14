@@ -9,7 +9,7 @@ namespace PGPresentation
     public class PostgreSQLProvider : IDBProvider, System.IDisposable
     {
         private NpgsqlConnection m_db;
-        private System.Action m_reconnectCallback;
+        private Action m_reconnectCallback;
 
         public PostgreSQLProvider(string ip, string port)
         {
@@ -57,7 +57,6 @@ namespace PGPresentation
         public void close()
         {
             m_db.Close();
-            //m_db.Dispose();
         }
 
         public Account getUserAccountData(string username)
@@ -171,9 +170,9 @@ namespace PGPresentation
             }
         }
 
-        public List<Common.Types.Employee> getEmployees(string search)
+        public List<Employee> getEmployees(string search)
         {
-            List<Common.Types.Employee> result = new List<Common.Types.Employee>();
+            List<Employee> result = new List<Common.Types.Employee>();
 
             string sql = "SELECT * FROM employees WHERE LOWER(fullname) LIKE LOWER(@search) OR LOWER(address) LIKE LOWER(@search)";
 
@@ -670,6 +669,23 @@ namespace PGPresentation
             return getItemByID(itemID, "queue_itemlist");
         }
 
+        private Item unsafe_convertToItem(NpgsqlDataReader data)
+        {
+            Item item = new Item();
+
+            item.id = data.GetInt32(0);
+            item.shelf_pos.x = data.GetInt32(3);
+            item.shelf_pos.y = data.GetInt32(4);
+            item.shelf_level = data.GetInt32(5);
+            item.name = data.GetString(7);
+            item.dim.length = data.GetInt32(8);
+            item.dim.width = data.GetInt32(9);
+            item.dim.height = data.GetInt32(10);
+            item.dim.weight = data.GetInt32(11);
+
+            return item;
+        }
+
         public List<Item> getItems(int warehouseID, string search)
         {
             List<Item> result = new List<Item>();
@@ -686,18 +702,62 @@ namespace PGPresentation
 
                 while (data.Read())
                 {
-                    Item item = new Item();
+                    Item item = unsafe_convertToItem(data);
+                    result.Add(item);
+                }
 
-                    item.id = data.GetInt32(0);
-                    item.shelf_pos.x = data.GetInt32(3);
-                    item.shelf_pos.y = data.GetInt32(4);
-                    item.shelf_level = data.GetInt32(5);
-                    item.name = data.GetString(7);
-                    item.dim.length = data.GetInt32(8);
-                    item.dim.width = data.GetInt32(9);
-                    item.dim.height = data.GetInt32(10);
-                    item.dim.weight = data.GetInt32(11);
+                data.Close();
+            }
 
+            return result;
+        }
+
+        public List<Item> getItems(int warehouseID, string name, int pos_x, int pos_y, int pos_level)
+        {
+            List<Item> result = new List<Item>();
+
+            string sql = "SELECT itemlist.*, item.* FROM itemlist INNER JOIN item ON itemlist.item_id=item.id " +
+                         "WHERE itemlist.room_id=@warehouseID AND item.name=@name AND itemlist.shelf_pos_x=@pos_x AND itemlist.shelf_pos_y=@pos_y AND itemlist.shelf_level=@pos_level";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("warehouseID", warehouseID);
+                cmd.Parameters.AddWithValue("name", name);
+                cmd.Parameters.AddWithValue("pos_x", pos_x);
+                cmd.Parameters.AddWithValue("pos_y", pos_y);
+                cmd.Parameters.AddWithValue("pos_level", pos_level);
+
+                var data = cmd.ExecuteReader();
+
+                while (data.Read())
+                {
+                    Item item = unsafe_convertToItem(data);
+                    result.Add(item);
+                }
+
+                data.Close();
+            }
+
+            return result;
+        }
+
+        public List<Item> getItemsByName(int warehouseID, string name)
+        {
+            List<Item> result = new List<Item>();
+
+            string sql = "SELECT itemlist.*, item.* FROM itemlist INNER JOIN item ON itemlist.item_id=item.id " +
+                         "WHERE itemlist.room_id=@warehouseID AND item.name=@name";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("warehouseID", warehouseID);
+                cmd.Parameters.AddWithValue("name", name);
+
+                var data = cmd.ExecuteReader();
+
+                while (data.Read())
+                {
+                    Item item = unsafe_convertToItem(data);
                     result.Add(item);
                 }
 

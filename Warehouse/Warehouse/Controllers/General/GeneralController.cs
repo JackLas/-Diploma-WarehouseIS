@@ -85,6 +85,7 @@ namespace Warehouse.Controllers.General
 
             m_db.deleteOrder(orderID);
             refreshOrderList();
+            refreshItemList(m_warehouseID, "");
         }
 
         public void cancelOrder(int orderID)
@@ -101,6 +102,7 @@ namespace Warehouse.Controllers.General
 
             m_db.deleteOrder(orderID);
             refreshOrderList();
+            refreshItemList(m_warehouseID, "");
         }
 
         public OrderDescriptionData getOrderDescription(int orderID)

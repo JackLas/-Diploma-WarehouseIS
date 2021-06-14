@@ -14,5 +14,9 @@ namespace Warehouse.Controllers.NewOrder
         public abstract void onCurrentShelfLevelsUpdate(int levels);
 
         public abstract void onModeUpdate();
+
+        public abstract void onItemNameAutocompleteUpdate(List<string> list);
+
+        public abstract void onAutocompleteMatch(List<Item> item);
     }
 }

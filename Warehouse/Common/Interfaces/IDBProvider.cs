@@ -70,5 +70,9 @@ namespace Common.Interfaces
         public abstract Types.OrderItem getQueuedItemByID(int itemID);
 
         public List<Types.Item> getItems(int warehouseID, string search = "");
+
+        public List<Types.Item> getItems(int warehouseID, string name, int pos_x, int pos_y, int pos_level);
+
+        public List<Types.Item> getItemsByName(int warehouseID, string name);
     }
 }

@@ -669,5 +669,42 @@ namespace PGPresentation
         {
             return getItemByID(itemID, "queue_itemlist");
         }
+
+        public List<Item> getItems(int warehouseID, string search)
+        {
+            List<Item> result = new List<Item>();
+
+            string sql = "SELECT itemlist.*, item.* FROM itemlist INNER JOIN item ON itemlist.item_id=item.id " +
+                         "WHERE itemlist.room_id=@warehouseID AND item.name LIKE @search";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("warehouseID", warehouseID);
+                cmd.Parameters.AddWithValue("search", "%"+search+"%");
+
+                var data = cmd.ExecuteReader();
+
+                while (data.Read())
+                {
+                    Item item = new Item();
+
+                    item.id = data.GetInt32(0);
+                    item.shelf_pos.x = data.GetInt32(3);
+                    item.shelf_pos.y = data.GetInt32(4);
+                    item.shelf_level = data.GetInt32(5);
+                    item.name = data.GetString(7);
+                    item.dim.length = data.GetInt32(8);
+                    item.dim.width = data.GetInt32(9);
+                    item.dim.height = data.GetInt32(10);
+                    item.dim.weight = data.GetInt32(11);
+
+                    result.Add(item);
+                }
+
+                data.Close();
+            }
+
+            return result;
+        }
     }
 }

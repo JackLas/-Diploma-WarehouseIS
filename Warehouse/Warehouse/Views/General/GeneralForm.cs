@@ -120,7 +120,11 @@ namespace Warehouse.Views.General
 
         private void tb_item_search_TextChanged(object sender, EventArgs e)
         {
-            // update list (maybe create a timer)
+            int id = getSelectWarehouseID();
+            if (id != -1)
+            {
+                m_ctrl.refreshItemList(id, tb_item_search.Text);
+            }
         }
 
         private void btn_new_order_Click(object sender, EventArgs e)
@@ -157,6 +161,7 @@ namespace Warehouse.Views.General
             {
                 m_ctrl.loadWarehouseTopology(id);
                 m_ctrl.refreshOrderList();
+                m_ctrl.refreshItemList(id, tb_item_search.Text);
             }
         }
 
@@ -198,6 +203,20 @@ namespace Warehouse.Views.General
             {
                 Form form = new OrderForm(orderID, lb_orders.SelectedItem.ToString(), m_ctrl);
                 form.Show();
+            }
+        }
+
+        public void onItemListUpdate(List<Common.Types.Item> list)
+        {
+            lb_items.Items.Clear();
+            foreach (var item in list)
+            {
+                lb_items.Items.Add(
+                    item.id.ToString() + ": " +
+                    "[" + Topology.TopologyBuilder.convertPosition(item.shelf_pos) + ":" + item.shelf_level.ToString() + "] " +
+                    item.name + 
+                    " (" + item.dim.length.ToString() + "x" + item.dim.width.ToString() + "x" + item.dim.height.ToString() + "x" + item.dim.weight.ToString() + ")"
+                );
             }
         }
     }

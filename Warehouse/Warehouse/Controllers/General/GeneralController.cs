@@ -107,5 +107,11 @@ namespace Warehouse.Controllers.General
         {
             return m_db.getOrderDescription(orderID);
         }
+
+        public void refreshItemList(int warehouseID, string search)
+        {
+            var list = m_db.getItems(warehouseID, search);
+            m_listener.onItemListUpdate(list);
+        }
     }
 }

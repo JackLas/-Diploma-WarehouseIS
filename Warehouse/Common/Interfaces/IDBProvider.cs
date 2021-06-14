@@ -68,5 +68,7 @@ namespace Common.Interfaces
         public abstract Types.OrderItem getItemByID(int itemID);
 
         public abstract Types.OrderItem getQueuedItemByID(int itemID);
+
+        public List<Types.Item> getItems(int warehouseID, string search = "");
     }
 }

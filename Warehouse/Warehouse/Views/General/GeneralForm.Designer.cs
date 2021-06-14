@@ -77,6 +77,7 @@ namespace Warehouse.Views.General
             this.lb_items.Name = "lb_items";
             this.lb_items.Size = new System.Drawing.Size(442, 589);
             this.lb_items.TabIndex = 1;
+            this.lb_items.SelectedIndexChanged += new System.EventHandler(this.lb_items_SelectedIndexChanged);
             this.lb_items.DoubleClick += new System.EventHandler(this.lb_items_DoubleClick);
             // 
             // tb_item_search
@@ -96,7 +97,7 @@ namespace Warehouse.Views.General
             this.tp_orders.Padding = new System.Windows.Forms.Padding(3);
             this.tp_orders.Size = new System.Drawing.Size(454, 629);
             this.tp_orders.TabIndex = 1;
-            this.tp_orders.Text = "Черга прийому";
+            this.tp_orders.Text = "Черга";
             this.tp_orders.UseVisualStyleBackColor = true;
             // 
             // btn_new_order

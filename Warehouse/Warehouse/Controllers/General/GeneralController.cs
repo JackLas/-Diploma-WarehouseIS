@@ -115,5 +115,10 @@ namespace Warehouse.Controllers.General
             var list = m_db.getItems(warehouseID, search);
             m_listener.onItemListUpdate(list);
         }
+
+        public OrderItem getItemByID(int id)
+        {
+            return m_db.getItemByID(id);
+        }
     }
 }

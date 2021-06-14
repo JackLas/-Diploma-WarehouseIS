@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using Warehouse.Controllers.General;
 using System.Collections.Generic;
 using System.IO;
+using Common.Types;
 
 namespace Warehouse.Views.General
 {
@@ -11,11 +12,16 @@ namespace Warehouse.Views.General
         private const string lastModeFile = "lastmode.dat";
         private GeneralController m_ctrl;
         private Topology.TopologyBuilder m_topologyBuilder;
+        private HighlightCell m_hightlightCell;
+
         public GeneralForm(int userID, int accessLevel)
         {
             InitializeComponent();
             m_ctrl = new GeneralController(this, userID, accessLevel);
             m_topologyBuilder = new Topology.TopologyBuilder();
+            m_topologyBuilder.setSimpleMode(true);
+
+            m_hightlightCell = null;
         }
 
         private void GeneralForm_Load(object sender, EventArgs e)
@@ -159,6 +165,7 @@ namespace Warehouse.Views.General
             int id = getSelectWarehouseID();
             if (id != -1)
             {
+                lb_items.SelectedIndex = -1;
                 m_ctrl.loadWarehouseTopology(id);
                 m_ctrl.refreshOrderList();
                 m_ctrl.refreshItemList(id, tb_item_search.Text);
@@ -177,7 +184,7 @@ namespace Warehouse.Views.General
 
         public void onCurrentTopologyUpdate(Common.Types.Topology topology)
         {
-            m_topologyBuilder.rebuild(topology, dgv_topologyWH);
+            m_topologyBuilder.rebuild(topology, dgv_topologyWH, m_hightlightCell);
         }
 
         public void onOrderListUpdate(List<Common.Types.Order> list)
@@ -217,6 +224,26 @@ namespace Warehouse.Views.General
                     item.name + 
                     " (" + item.dim.length.ToString() + "x" + item.dim.width.ToString() + "x" + item.dim.height.ToString() + "x" + item.dim.weight.ToString() + ")"
                 );
+            }
+        }
+
+        private void lb_items_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            m_hightlightCell = null;
+            int whID = getSelectWarehouseID();
+            if (whID != -1)
+            {
+                if (lb_items.SelectedIndex != -1)
+                {
+                    int itemId = -1;
+                    if (Common.Utils.getIDFromString(lb_items.SelectedItem.ToString(), out itemId))
+                    {
+                        var item = m_ctrl.getItemByID(itemId);
+                        m_hightlightCell = new HighlightCell(item.pos.x, item.pos.y, item.level);
+                    }
+                }
+
+                m_ctrl.loadWarehouseTopology(whID);
             }
         }
     }

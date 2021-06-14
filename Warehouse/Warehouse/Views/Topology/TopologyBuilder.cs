@@ -1,5 +1,7 @@
 ﻿using System.Windows.Forms;
 using System.Drawing;
+using System.Collections.Generic;
+using Common.Types;
 
 namespace Warehouse.Views.Topology
 {
@@ -7,14 +9,21 @@ namespace Warehouse.Views.Topology
     {
         private static string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         private const int cellSize = 50;
-        private DataGridViewCellStyle m_shelfCell;
+        private DataGridViewCellStyle m_shelfCellCell;
+        private DataGridViewCellStyle m_highlightedCellStyle;
+        private bool m_isSimplifiedMode = false;
 
         public TopologyBuilder()
         {
-            m_shelfCell = new DataGridViewCellStyle();
-            m_shelfCell.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            m_shelfCell.BackColor = Color.Blue;
-            m_shelfCell.ForeColor = Color.White;
+            m_shelfCellCell = new DataGridViewCellStyle();
+            m_shelfCellCell.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            m_shelfCellCell.BackColor = Color.Blue;
+            m_shelfCellCell.ForeColor = Color.White;
+
+            m_highlightedCellStyle = new DataGridViewCellStyle();
+            m_highlightedCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            m_highlightedCellStyle.BackColor = Color.Orange;
+            m_highlightedCellStyle.ForeColor = Color.Black;
         }
 
         public void setDefaultSettings(DataGridView grid)
@@ -45,7 +54,12 @@ namespace Warehouse.Views.Topology
             grid.ColumnHeadersDefaultCellStyle = colDefStyle;
         }
 
-        public void rebuild(Common.Types.Topology input, DataGridView output)
+        public void setSimpleMode(bool state)
+        {
+            m_isSimplifiedMode = state;
+        }
+
+        public void rebuild(Common.Types.Topology input, DataGridView output, HighlightCell hightlightCell = null)
         {
             output.RowCount = input.getSizeY();
             output.ColumnCount = input.getSizeX();
@@ -56,7 +70,6 @@ namespace Warehouse.Views.Topology
                 {
                     DataGridViewCell cell = new DataGridViewTextBoxCell();
                     cell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
-                    //cell.Value = normalizeToAlphabet(x) + y.ToString(); // dbg
                     output[x, y] = cell;
 
                     if (y == 0)
@@ -75,8 +88,19 @@ namespace Warehouse.Views.Topology
             foreach (var shelf in input.getShelfList())
             {
                 var cell = output[shelf.x, shelf.y];
-                cell.Style = m_shelfCell.Clone();
-                cell.Value = shelf.shelfID.ToString();
+                cell.Style = m_shelfCellCell.Clone();
+                if (!m_isSimplifiedMode)
+                {
+                    cell.Value = shelf.shelfID.ToString();
+                }
+            }
+
+            if (hightlightCell != null)
+            {
+                DataGridViewCell cell = new DataGridViewTextBoxCell();
+                cell.Style = m_highlightedCellStyle.Clone();
+                cell.Value = hightlightCell.z.ToString();
+                output[hightlightCell.x, hightlightCell.y] = cell;
             }
 
             output.ClearSelection();

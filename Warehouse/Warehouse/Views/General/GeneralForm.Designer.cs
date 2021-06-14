@@ -77,6 +77,8 @@ namespace Warehouse.Views.General
             this.lb_items.Name = "lb_items";
             this.lb_items.Size = new System.Drawing.Size(442, 589);
             this.lb_items.TabIndex = 1;
+            this.lb_items.SelectedIndexChanged += new System.EventHandler(this.lb_items_SelectedIndexChanged);
+            this.lb_items.DoubleClick += new System.EventHandler(this.lb_items_DoubleClick);
             // 
             // tb_item_search
             // 
@@ -95,7 +97,7 @@ namespace Warehouse.Views.General
             this.tp_orders.Padding = new System.Windows.Forms.Padding(3);
             this.tp_orders.Size = new System.Drawing.Size(454, 629);
             this.tp_orders.TabIndex = 1;
-            this.tp_orders.Text = "Черга прийому";
+            this.tp_orders.Text = "Черга";
             this.tp_orders.UseVisualStyleBackColor = true;
             // 
             // btn_new_order
@@ -116,6 +118,7 @@ namespace Warehouse.Views.General
             this.lb_orders.Name = "lb_orders";
             this.lb_orders.Size = new System.Drawing.Size(442, 589);
             this.lb_orders.TabIndex = 0;
+            this.lb_orders.DoubleClick += new System.EventHandler(this.lb_orders_DoubleClick);
             // 
             // tp_admin
             // 
@@ -142,6 +145,7 @@ namespace Warehouse.Views.General
             this.cb_currentWH.Name = "cb_currentWH";
             this.cb_currentWH.Size = new System.Drawing.Size(772, 23);
             this.cb_currentWH.TabIndex = 2;
+            this.cb_currentWH.SelectedIndexChanged += new System.EventHandler(this.cb_currentWH_SelectedIndexChanged);
             // 
             // GeneralForm
             // 
@@ -155,7 +159,8 @@ namespace Warehouse.Views.General
             this.Name = "GeneralForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Склад - Головна";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.GeneralForm_FormClosed);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.GeneralForm_FormClosing);
+            this.Load += new System.EventHandler(this.GeneralForm_Load);
             this.tabs.ResumeLayout(false);
             this.tp_items.ResumeLayout(false);
             this.tp_items.PerformLayout();

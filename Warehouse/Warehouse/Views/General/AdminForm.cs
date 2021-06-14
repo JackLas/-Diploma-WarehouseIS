@@ -27,8 +27,8 @@ namespace Warehouse.Views.General
             m_topologyBuilder.setDefaultSettings(dgv_topology);
 
             cb_empl_post.Items.Clear();
-            cb_empl_post.Items.Add("Адміністратор");
             cb_empl_post.Items.Add("Робітник складу");
+            cb_empl_post.Items.Add("Адміністратор");
 
             m_ctrl.refreshEmployeeList();
             m_ctrl.refreshClientList();

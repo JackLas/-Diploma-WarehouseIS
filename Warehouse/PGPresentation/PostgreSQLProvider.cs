@@ -1,6 +1,7 @@
 ﻿using Common.Interfaces;
 using Common.Types;
 using Npgsql;
+using System;
 using System.Collections.Generic;
 
 namespace PGPresentation
@@ -8,7 +9,7 @@ namespace PGPresentation
     public class PostgreSQLProvider : IDBProvider, System.IDisposable
     {
         private NpgsqlConnection m_db;
-        private System.Action m_reconnectCallback;
+        private Action m_reconnectCallback;
 
         public PostgreSQLProvider(string ip, string port)
         {
@@ -56,7 +57,6 @@ namespace PGPresentation
         public void close()
         {
             m_db.Close();
-            m_db.Dispose();
         }
 
         public Account getUserAccountData(string username)
@@ -76,6 +76,7 @@ namespace PGPresentation
                     result.username = data.GetString(1);
                     result.password_hash = data.IsDBNull(2) ? "" : data.GetString(2);
                     result.isActive = data.GetBoolean(3);
+                    result.accessLevel = data.GetInt32(4);
                 }
                 data.Close();
                 return result;
@@ -99,6 +100,7 @@ namespace PGPresentation
                     result.username = data.GetString(1);
                     result.password_hash = data.IsDBNull(2) ? "" : data.GetString(2);
                     result.isActive = data.GetBoolean(3);
+                    result.accessLevel = data.GetInt32(4);
                 }
                 data.Close();
                 return result;
@@ -168,9 +170,9 @@ namespace PGPresentation
             }
         }
 
-        public List<Common.Types.Employee> getEmployees(string search)
+        public List<Employee> getEmployees(string search)
         {
-            List<Common.Types.Employee> result = new List<Common.Types.Employee>();
+            List<Employee> result = new List<Common.Types.Employee>();
 
             string sql = "SELECT * FROM employees WHERE LOWER(fullname) LIKE LOWER(@search) OR LOWER(address) LIKE LOWER(@search)";
 
@@ -387,6 +389,382 @@ namespace PGPresentation
 
                 cmd.ExecuteNonQuery();
             }
+        }
+
+        public List<Identificator> getRoomsIdentificatorList()
+        {
+            List<Identificator> result = new List<Identificator>();
+
+            string sql = "SELECT id, name FROM room";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                var data = cmd.ExecuteReader();
+
+                while (data.Read())
+                {
+                    Identificator id = new Identificator();
+
+                    id.ID = data.GetInt32(0);
+                    id.name = data.GetString(1);
+
+                    result.Add(id);
+                }
+
+                data.Close();
+            }
+
+            return result;
+        }
+
+        public string getTopologyByID(int id)
+        {
+            string result = "";
+            string sql = "SELECT topology FROM room WHERE id=@id";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("id", id);
+
+                var data = cmd.ExecuteReader();
+                if (data.Read())
+                {
+                    result = data.GetString(0);
+                }
+                data.Close();
+            }
+
+            return result;
+        }
+
+        public int getItemID(string name, int length, int width, int height, int weight)
+        {
+            string sql = "SELECT id FROM item WHERE name=@name AND length=@length AND width=@width AND height=@height AND weight=@weight";
+
+            int id = -1;
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("name", name);
+                cmd.Parameters.AddWithValue("length", length);
+                cmd.Parameters.AddWithValue("width", width);
+                cmd.Parameters.AddWithValue("height", height);
+                cmd.Parameters.AddWithValue("weight", weight);
+
+                var data = cmd.ExecuteReader();
+
+                if (data.Read())
+                {
+                    id = data.GetInt32(0);
+                }
+
+                data.Close();
+            }
+
+            return id;
+        }
+
+        public void createItem(string name, int length, int width, int height, int weight)
+        {
+            string sql = "INSERT INTO item (name, length, width, height, weight) VALUES (@name, @length, @width, @height, @weight)";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("name", name);
+                cmd.Parameters.AddWithValue("length", length);
+                cmd.Parameters.AddWithValue("width", width);
+                cmd.Parameters.AddWithValue("height", height);
+                cmd.Parameters.AddWithValue("weight", weight);
+
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public int addItemToReceiveQueue(int itemID, int roomID, int shelfX, int shelfY, int shelfLvl)
+        {
+            string sql = "INSERT INTO queue_itemlist(item_id, room_id, shelf_pos_x, shelf_pos_y, shelf_level) VALUES (@itemID, @roomID, @shelfX, @shelfY, @shelfLvl) RETURNING id";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("itemID", itemID);
+                cmd.Parameters.AddWithValue("roomID", roomID);
+                cmd.Parameters.AddWithValue("shelfX", shelfX);
+                cmd.Parameters.AddWithValue("shelfY", shelfY);
+                cmd.Parameters.AddWithValue("shelfLvl", shelfLvl);
+
+                return Convert.ToInt32(cmd.ExecuteScalar());
+            }
+        }
+        
+        public void createOrder(int clientID, int roomID, List<int> items, OrderType type)
+        {
+            string sql = "INSERT INTO orderlist(client_id, type, room_id, items) VALUES (@clientID, @type, @roomID, @items)";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("clientID", clientID);
+                cmd.Parameters.AddWithValue("type", (int)type);
+                cmd.Parameters.AddWithValue("roomID", roomID);
+
+                var itemsParam = new NpgsqlParameter("items", NpgsqlTypes.NpgsqlDbType.Array | NpgsqlTypes.NpgsqlDbType.Integer);
+                itemsParam.Value = items.ToArray();
+                cmd.Parameters.Add(itemsParam);
+
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public List<Order> getOrders(int roomID)
+        {
+            List<Order> result = new List<Order>();
+
+            string sql = "SELECT orderlist.id, clients.title, orderlist.type FROM orderlist INNER JOIN clients ON orderlist.client_id=clients.id WHERE room_id=@roomID ORDER BY orderlist.id ASC";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("roomID", roomID);
+
+                var data = cmd.ExecuteReader();
+
+                while(data.Read())
+                {
+                    Order order = new Order();
+
+                    order.id = data.GetInt32(0);
+                    order.clientName = data.GetString(1);
+                    order.type = (OrderType)data.GetInt32(2);
+
+                    result.Add(order);
+                }
+
+                data.Close();
+            }
+
+            return result;
+        }
+
+        private OrderItem getItemByID(int itemID, string tableName)
+        {
+            OrderItem result = null;
+            string sql = "SELECT " + tableName + ".*, item.name FROM " + tableName + " INNER JOIN item ON item_id=item.id WHERE "+tableName+".id=@itemID";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("itemID", itemID);
+
+                var data = cmd.ExecuteReader();
+
+                if (data.Read())
+                {
+                    result = new OrderItem();
+                    result.id = data.GetInt32(0);
+                    result.item_id = data.GetInt32(1);
+                    result.room_id = data.GetInt32(2);
+                    result.name = data.GetString(6);
+                    result.pos.x = data.GetInt32(3);
+                    result.pos.y = data.GetInt32(4);
+                    result.level = data.GetInt32(5);
+                }
+
+                data.Close();
+            }
+
+            return result;
+        }
+
+        public OrderDescriptionData getOrderDescription(int orderID)
+        {
+            OrderDescriptionData result = new OrderDescriptionData();
+            int[] items = {};
+            string itemsTable = "";
+
+            string sql = "SELECT orderlist.id, orderlist.items, clients.title, clients.address, orderlist.type FROM orderlist INNER JOIN clients ON orderlist.client_id=clients.id WHERE orderlist.id=@orderID";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("orderID", orderID);
+
+                var data = cmd.ExecuteReader();
+
+                if (data.Read())
+                {
+                    result.id = data.GetInt32(0);
+                    items = data.GetFieldValue<int[]>(1);
+                    result.client.title = data.GetString(2);
+                    result.client.address = data.GetString(3);
+                    itemsTable = ((OrderType)data.GetInt32(4) == OrderType.RECEIVE ? "queue_itemlist" : "itemlist");
+                    result.type = (OrderType)data.GetInt32(4);
+                }
+
+                data.Close();
+            }
+
+            
+            foreach (int i in items)
+            {
+                var item = getItemByID(i, itemsTable);
+                result.items.Add(item);
+            }
+
+            return result;
+        }
+
+        public void deleteOrder(int orderID)
+        {
+            string sql = "DELETE FROM orderlist WHERE id=@orderID";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("orderID", orderID);
+
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        private void deleteItem(int itemID, string tableName)
+        {
+            string sql = "DELETE FROM "+tableName+" WHERE id=@itemID";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("itemID", itemID);
+
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public void deleteItem(int itemID)
+        {
+            deleteItem(itemID, "itemlist");
+        }
+
+        public void deleteQueuedItem(int itemID)
+        {
+            deleteItem(itemID, "queue_itemlist");
+        }
+
+        public int addItem(int itemID, int roomID, int shelfX, int shelfY, int shelfLvl)
+        {
+            string sql = "INSERT INTO itemlist(item_id, room_id, shelf_pos_x, shelf_pos_y, shelf_level) VALUES (@itemID, @roomID, @shelfX, @shelfY, @shelfLvl) RETURNING id";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("itemID", itemID);
+                cmd.Parameters.AddWithValue("roomID", roomID);
+                cmd.Parameters.AddWithValue("shelfX", shelfX);
+                cmd.Parameters.AddWithValue("shelfY", shelfY);
+                cmd.Parameters.AddWithValue("shelfLvl", shelfLvl);
+
+                return Convert.ToInt32(cmd.ExecuteScalar());
+            }
+        }
+
+        public OrderItem getItemByID(int itemID)
+        {
+            return getItemByID(itemID, "itemlist");
+        }
+
+        public OrderItem getQueuedItemByID(int itemID)
+        {
+            return getItemByID(itemID, "queue_itemlist");
+        }
+
+        private Item unsafe_convertToItem(NpgsqlDataReader data)
+        {
+            Item item = new Item();
+
+            item.id = data.GetInt32(0);
+            item.shelf_pos.x = data.GetInt32(3);
+            item.shelf_pos.y = data.GetInt32(4);
+            item.shelf_level = data.GetInt32(5);
+            item.name = data.GetString(7);
+            item.dim.length = data.GetInt32(8);
+            item.dim.width = data.GetInt32(9);
+            item.dim.height = data.GetInt32(10);
+            item.dim.weight = data.GetInt32(11);
+
+            return item;
+        }
+
+        public List<Item> getItems(int warehouseID, string search)
+        {
+            List<Item> result = new List<Item>();
+
+            string sql = "SELECT itemlist.*, item.* FROM itemlist INNER JOIN item ON itemlist.item_id=item.id " +
+                         "WHERE itemlist.room_id=@warehouseID AND item.name LIKE @search";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("warehouseID", warehouseID);
+                cmd.Parameters.AddWithValue("search", "%"+search+"%");
+
+                var data = cmd.ExecuteReader();
+
+                while (data.Read())
+                {
+                    Item item = unsafe_convertToItem(data);
+                    result.Add(item);
+                }
+
+                data.Close();
+            }
+
+            return result;
+        }
+
+        public List<Item> getItems(int warehouseID, string name, int pos_x, int pos_y, int pos_level)
+        {
+            List<Item> result = new List<Item>();
+
+            string sql = "SELECT itemlist.*, item.* FROM itemlist INNER JOIN item ON itemlist.item_id=item.id " +
+                         "WHERE itemlist.room_id=@warehouseID AND item.name=@name AND itemlist.shelf_pos_x=@pos_x AND itemlist.shelf_pos_y=@pos_y AND itemlist.shelf_level=@pos_level";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("warehouseID", warehouseID);
+                cmd.Parameters.AddWithValue("name", name);
+                cmd.Parameters.AddWithValue("pos_x", pos_x);
+                cmd.Parameters.AddWithValue("pos_y", pos_y);
+                cmd.Parameters.AddWithValue("pos_level", pos_level);
+
+                var data = cmd.ExecuteReader();
+
+                while (data.Read())
+                {
+                    Item item = unsafe_convertToItem(data);
+                    result.Add(item);
+                }
+
+                data.Close();
+            }
+
+            return result;
+        }
+
+        public List<Item> getItemsByName(int warehouseID, string name)
+        {
+            List<Item> result = new List<Item>();
+
+            string sql = "SELECT itemlist.*, item.* FROM itemlist INNER JOIN item ON itemlist.item_id=item.id " +
+                         "WHERE itemlist.room_id=@warehouseID AND item.name=@name";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("warehouseID", warehouseID);
+                cmd.Parameters.AddWithValue("name", name);
+
+                var data = cmd.ExecuteReader();
+
+                while (data.Read())
+                {
+                    Item item = unsafe_convertToItem(data);
+                    result.Add(item);
+                }
+
+                data.Close();
+            }
+
+            return result;
         }
     }
 }

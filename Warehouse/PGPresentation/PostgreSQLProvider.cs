@@ -559,6 +559,8 @@ namespace PGPresentation
                 {
                     result = new OrderItem();
                     result.id = data.GetInt32(0);
+                    result.item_id = data.GetInt32(1);
+                    result.room_id = data.GetInt32(2);
                     result.name = data.GetString(6);
                     result.pos.x = data.GetInt32(3);
                     result.pos.y = data.GetInt32(4);
@@ -592,6 +594,7 @@ namespace PGPresentation
                     result.client.title = data.GetString(2);
                     result.client.address = data.GetString(3);
                     itemsTable = ((OrderType)data.GetInt32(4) == OrderType.RECEIVE ? "queue_itemlist" : "itemlist");
+                    result.type = (OrderType)data.GetInt32(4);
                 }
 
                 data.Close();
@@ -617,6 +620,54 @@ namespace PGPresentation
 
                 cmd.ExecuteNonQuery();
             }
+        }
+
+        private void deleteItem(int itemID, string tableName)
+        {
+            string sql = "DELETE FROM "+tableName+" WHERE id=@itemID";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("itemID", itemID);
+
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public void deleteItem(int itemID)
+        {
+            deleteItem(itemID, "itemlist");
+        }
+
+        public void deleteQueuedItem(int itemID)
+        {
+            deleteItem(itemID, "queue_itemlist");
+        }
+
+        public int addItem(int itemID, int roomID, int shelfX, int shelfY, int shelfLvl)
+        {
+            string sql = "INSERT INTO itemlist(item_id, room_id, shelf_pos_x, shelf_pos_y, shelf_level) VALUES (@itemID, @roomID, @shelfX, @shelfY, @shelfLvl) RETURNING id";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("itemID", itemID);
+                cmd.Parameters.AddWithValue("roomID", roomID);
+                cmd.Parameters.AddWithValue("shelfX", shelfX);
+                cmd.Parameters.AddWithValue("shelfY", shelfY);
+                cmd.Parameters.AddWithValue("shelfLvl", shelfLvl);
+
+                return Convert.ToInt32(cmd.ExecuteScalar());
+            }
+        }
+
+        public OrderItem getItemByID(int itemID)
+        {
+            return getItemByID(itemID, "itemlist");
+        }
+
+        public OrderItem getQueuedItemByID(int itemID)
+        {
+            return getItemByID(itemID, "queue_itemlist");
         }
     }
 }

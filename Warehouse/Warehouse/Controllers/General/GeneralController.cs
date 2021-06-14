@@ -64,11 +64,41 @@ namespace Warehouse.Controllers.General
         }
         public void applyOrder(int orderID)
         {
+            var desc = m_db.getOrderDescription(orderID);
+
+            foreach (var item in desc.items)
+            {   
+                if (desc.type == OrderType.SEND)
+                {
+                    m_db.deleteItem(item.id);
+                }
+                else if (desc.type == OrderType.RECEIVE)
+                {
+                    var queuedItem = m_db.getQueuedItemByID(item.id);
+                    if (queuedItem != null)
+                    {
+                        m_db.addItem(queuedItem.item_id, queuedItem.room_id, queuedItem.pos.x, queuedItem.pos.y, queuedItem.level);
+                        m_db.deleteQueuedItem(item.id);
+                    }
+                }
+            }
+
+            m_db.deleteOrder(orderID);
             refreshOrderList();
         }
 
         public void cancelOrder(int orderID)
         {
+            var desc = m_db.getOrderDescription(orderID);
+
+            foreach (var item in desc.items)
+            {
+                if (desc.type == OrderType.RECEIVE)
+                {
+                    m_db.deleteQueuedItem(item.id);
+                }
+            }
+
             m_db.deleteOrder(orderID);
             refreshOrderList();
         }

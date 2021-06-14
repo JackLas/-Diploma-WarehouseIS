@@ -12,5 +12,6 @@ namespace Common.Types
         public int id { get; set; }
         public Client client { get; set; }
         public List<OrderItem> items { get; set; }
+        public OrderType type { get; set; }
     }
 }

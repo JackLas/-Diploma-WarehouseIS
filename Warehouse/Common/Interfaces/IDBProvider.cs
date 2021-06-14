@@ -58,5 +58,15 @@ namespace Common.Interfaces
         public abstract Types.OrderDescriptionData getOrderDescription(int orderID);
 
         public abstract void deleteOrder(int orderID);
+
+        public abstract void deleteItem(int itemID);
+
+        public abstract void deleteQueuedItem(int itemID);
+
+        public abstract int addItem(int itemID, int roomID, int shelfX, int shelfY, int shelfLvl);
+
+        public abstract Types.OrderItem getItemByID(int itemID);
+
+        public abstract Types.OrderItem getQueuedItemByID(int itemID);
     }
 }

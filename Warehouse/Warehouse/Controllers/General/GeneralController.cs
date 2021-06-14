@@ -64,12 +64,13 @@ namespace Warehouse.Controllers.General
         }
         public void applyOrder(int orderID)
         {
-
+            refreshOrderList();
         }
 
         public void cancelOrder(int orderID)
         {
-
+            m_db.deleteOrder(orderID);
+            refreshOrderList();
         }
 
         public OrderDescriptionData getOrderDescription(int orderID)

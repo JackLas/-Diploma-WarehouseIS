@@ -606,5 +606,17 @@ namespace PGPresentation
 
             return result;
         }
+
+        public void deleteOrder(int orderID)
+        {
+            string sql = "DELETE FROM orderlist WHERE id=@orderID";
+
+            using (var cmd = new NpgsqlCommand(sql, m_db))
+            {
+                cmd.Parameters.AddWithValue("orderID", orderID);
+
+                cmd.ExecuteNonQuery();
+            }
+        }
     }
 }

@@ -44,7 +44,6 @@ namespace Warehouse.Views.General
                     m_ctrl.createOrder(clientID);
                     this.Close();
                 }
-
             }
         }
 
@@ -198,6 +197,7 @@ namespace Warehouse.Views.General
             }
 
             m_ctrl.refreshCurrentShelfLevels(Topology.TopologyBuilder.convertPosition(cb_shelf.SelectedItem.ToString()));
+            cb_shelf.SelectedIndex = -1;
         }
 
         public void onModeUpdate()

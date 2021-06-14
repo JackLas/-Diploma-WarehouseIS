@@ -55,6 +55,8 @@ namespace Common.Interfaces
 
         public abstract List<Types.Order> getOrders(int roomID);
 
-        public abstract Types.OrderDescriptionData getOrderDescription(int orderID); 
+        public abstract Types.OrderDescriptionData getOrderDescription(int orderID);
+
+        public abstract void deleteOrder(int orderID);
     }
 }

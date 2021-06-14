@@ -22,7 +22,7 @@ namespace Warehouse.Views.General
             var desc = m_ctrl.getOrderDescription(m_orderID);
             if (desc == null) return;
 
-            tb_clientName.Text = desc.client.title + "(" + desc.client.address +")";
+            tb_clientName.Text = desc.client.title + " (" + desc.client.address +")";
 
             foreach (var item in desc.items)
             {
@@ -42,6 +42,7 @@ namespace Warehouse.Views.General
         private void btn_cancle_Click(object sender, EventArgs e)
         {
             m_ctrl.cancelOrder(m_orderID);
+            this.Close();
         }
     }
 }

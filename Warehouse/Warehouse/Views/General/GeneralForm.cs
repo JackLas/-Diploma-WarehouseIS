@@ -87,6 +87,7 @@ namespace Warehouse.Views.General
 
         private void tabs_Selected(object sender, TabControlEventArgs e)
         {
+            lb_items.ClearSelected();
             if (e.TabPage.Name == "tp_admin")
             {
                 bool isWHRestored = false;

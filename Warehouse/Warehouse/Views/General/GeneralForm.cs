@@ -72,6 +72,10 @@ namespace Warehouse.Views.General
                 file.Flush();
                 file.Close();
             }
+            else if (File.Exists(lastModeFile))
+            {
+                File.Delete(lastModeFile);
+            }
         }
 
         public void onAccessLevelUpdate(Common.Types.Posts post)
@@ -101,8 +105,7 @@ namespace Warehouse.Views.General
             if (e.TabPage.Name == "tp_admin")
             {
                 bool isWHRestored = false;
-                int selectedWH = -1;
-                Common.Utils.getIDFromString(cb_currentWH.SelectedItem.ToString(), out selectedWH);
+                int selectedWH = getSelectWarehouseID();
 
                 m_ctrl.pauseResume();
                 openDialog(new AdminForm()); // block while AdminForm is active
